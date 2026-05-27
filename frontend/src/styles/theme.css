@@ -1,0 +1,190 @@
+:root {
+  /* Primary Colors - Modern Blue */
+  --primary-50: 240 100% 97%;
+  --primary-100: 217 91% 60%;
+  --primary-200: 199 89% 48%;
+  --primary-300: 199 89% 48%;
+  --primary-400: 199 89% 48%;
+  --primary-500: 199 89% 48%;
+  --primary-600: 199 89% 48%;
+  --primary-700: 199 89% 48%;
+  --primary-800: 199 89% 48%;
+  --primary-900: 199 89% 48%;
+
+  /* Neutral Colors */
+  --neutral-50: 0 0% 100%;
+  --neutral-100: 0 0% 98%;
+  --neutral-200: 0 0% 96%;
+  --neutral-300: 0 0% 92%;
+  --neutral-400: 0 0% 74%;
+  --neutral-500: 0 0% 55%;
+  --neutral-600: 0 0% 45%;
+  --neutral-700: 0 0% 38%;
+  --neutral-800: 0 0% 24%;
+  --neutral-900: 0 0% 15%;
+  --neutral-950: 0 0% 8%;
+
+  /* Semantic Colors */
+  --success-500: 142 76% 36%;
+  --danger-500: 0 84% 60%;
+  --warning-500: 38 92% 50%;
+
+  /* Base Colors */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 8%;
+  --primary: 199 89% 48%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 8%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 8%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 92%;
+  --input: 0 0% 92%;
+  --ring: 199 89% 48%;
+
+  /* Design Tokens */
+  --radius: 0.75rem;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+
+  /* Glassmorphism Tokens */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-blur: 12px;
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+  /* Gradient Tokens */
+  --gradient-primary: linear-gradient(135deg, hsl(199, 89%, 48%) 0%, hsl(217, 91%, 60%) 100%);
+  --gradient-secondary: linear-gradient(135deg, hsl(263, 70%, 50%) 0%, hsl(238, 84%, 67%) 100%);
+  --gradient-subtle: linear-gradient(135deg, rgba(199, 89%, 48%, 0.1) 0%, rgba(217, 91%, 60%, 0.1) 100%);
+
+  /* Elevation Tokens */
+  --elevation-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  --elevation-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --elevation-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --elevation-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.04);
+
+  /* Neon Accent Tokens */
+  --neon-indigo: 263 70% 50%;
+  --neon-purple: 238 84% 67%;
+  --neon-blue: 199 89% 48%;
+
+  /* Animation Easing */
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark {
+  --background: 0 0% 8%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 199 89% 48%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 64%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 199 89% 48%;
+
+  /* Glassmorphism Tokens - Dark Mode */
+  --glass-bg: rgba(10, 10, 15, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 16px;
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
+
+  /* Gradient Tokens - Dark Mode */
+  --gradient-primary: linear-gradient(135deg, hsl(199, 89%, 48%) 0%, hsl(217, 91%, 60%) 100%);
+  --gradient-secondary: linear-gradient(135deg, hsl(263, 70%, 50%) 0%, hsl(238, 84%, 67%) 100%);
+  --gradient-subtle: linear-gradient(135deg, rgba(199, 89%, 48%, 0.15) 0%, rgba(217, 91%, 60%, 0.15) 100%);
+
+  /* Elevation Tokens - Dark Mode */
+  --elevation-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --elevation-md: 0 4px 6px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.15);
+  --elevation-lg: 0 10px 15px rgba(0, 0, 0, 0.25), 0 4px 6px rgba(0, 0, 0, 0.15);
+  --elevation-xl: 0 20px 25px rgba(0, 0, 0, 0.25), 0 8px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* Base Styles */
+* {
+  @apply border-border;
+}
+
+body {
+  @apply bg-background text-foreground font-body antialiased;
+}
+
+/* Typography Utilities */
+.font-heading {
+  font-family: 'Sora', sans-serif;
+}
+
+.font-body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* Focus styles */
+*:focus-visible {
+  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+}
+
+/* Selection */
+::selection {
+  @apply bg-primary/20;
+}
