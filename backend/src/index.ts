@@ -13,11 +13,14 @@ import { integrationRoutes } from './modules/integrations/routes';
 import { webhookRoutes } from './modules/webhooks/routes';
 import { realtimeRoutes } from './modules/realtime/routes';
 import { aiRoutes } from './modules/ai/routes';
+import { searchRoutes } from './modules/search/routes';
 import { registerActivityFeedHandler } from './modules/events/handlers/activity-feed.handler';
 import { registerRealtimeBroadcastHandler } from './modules/events/handlers/realtime-broadcast.handler';
 import { registerNotificationHandler } from './modules/events/handlers/notification.handler';
 import { registerSummaryTriggerHandler } from './modules/ai/handlers/summary-trigger.handler';
 import { registerInsightGenerationHandler } from './modules/ai/handlers/insight-generation.handler';
+import { registerIndexingHandler } from './modules/search/handlers/indexing.handler';
+import { IndexingPipeline } from './search/indexing/IndexingPipeline';
 import { AppError } from './shared/errors';
 import { InternalEventBus } from './core/event-bus';
 
@@ -80,6 +83,7 @@ function wireEventHandlers() {
   registerNotificationHandler();
   registerSummaryTriggerHandler();
   registerInsightGenerationHandler();
+  registerIndexingHandler();
 }
 
 // Register routes
@@ -89,6 +93,7 @@ async function registerRoutes() {
   await fastify.register(webhookRoutes, { prefix: '/api' });
   await fastify.register(realtimeRoutes, { prefix: '/api' });
   await fastify.register(aiRoutes, { prefix: '/api' });
+  await fastify.register(searchRoutes, { prefix: '/api' });
 
   // Health check endpoint
   fastify.get('/health', async () => {
@@ -126,6 +131,10 @@ async function start() {
     await registerPlugins();
     wireEventHandlers();
     await registerRoutes();
+
+    // Start indexing pipeline
+    const indexingPipeline = IndexingPipeline.getInstance();
+    indexingPipeline.start();
 
     const port = parseInt(env.PORT, 10);
     const host = env.HOST;
