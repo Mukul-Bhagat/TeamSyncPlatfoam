@@ -1,5 +1,5 @@
 import type { ITrigger, TriggerMatchResult, TriggerMetadata } from './ITrigger';
-import type { EcosystemEvent } from '../../../types';
+import type { EcosystemEvent } from '../../types';
 
 export interface EventTriggerConfig {
   event_type: string;
@@ -21,12 +21,12 @@ export class EventTrigger implements ITrigger {
     this.config = config;
     this.metadata = {
       type: 'event',
-      config,
+      config: config as unknown as Record<string, unknown>,
       enabled: true,
     };
   }
 
-  async match(event?: EcosystemEvent, context?: Record<string, unknown>): Promise<TriggerMatchResult> {
+  async match(event?: EcosystemEvent, _context?: Record<string, unknown>): Promise<TriggerMatchResult> {
     if (!event) {
       return { matched: false, reason: 'No event provided' };
     }
@@ -73,7 +73,7 @@ export class EventTrigger implements ITrigger {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as EventTriggerConfig;
+    const cfg = config as unknown as EventTriggerConfig;
     return !!(cfg.event_type && typeof cfg.event_type === 'string');
   }
 
@@ -97,7 +97,7 @@ export class EventTrigger implements ITrigger {
   }
 
   private getNestedValue(obj: any, path: string): unknown {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private evaluateCondition(value: unknown, operator: string, expected?: unknown): boolean {

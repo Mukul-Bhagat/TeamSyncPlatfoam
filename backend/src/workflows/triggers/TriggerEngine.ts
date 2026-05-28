@@ -1,5 +1,5 @@
 import { InternalEventBus } from '../../core/event-bus/InternalEventBus';
-import type { EcosystemEvent } from '../../../types';
+import type { EcosystemEvent } from '../../types';
 import { TriggerRegistry } from './TriggerRegistry';
 import { WorkflowLogger } from '../engine/WorkflowLogger';
 import { WorkflowEngine } from '../engine/WorkflowEngine';

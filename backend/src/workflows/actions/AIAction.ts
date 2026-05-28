@@ -10,8 +10,8 @@ export interface AIActionConfig {
 }
 
 export class AIAction implements IWorkflowAction {
-  async execute(config: Record<string, unknown>, context: Record<string, unknown>): Promise<ActionResult> {
-    const cfg = config as AIActionConfig;
+  async execute(config: Record<string, unknown>, _context: Record<string, unknown>): Promise<ActionResult> {
+    const cfg = config as unknown as AIActionConfig;
 
     try {
       // TODO: Integrate with AIOrchestrator
@@ -41,7 +41,7 @@ export class AIAction implements IWorkflowAction {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as AIActionConfig;
+    const cfg = config as unknown as AIActionConfig;
     return !!(cfg.prompt && typeof cfg.prompt === 'string');
   }
 

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SummaryAction = void 0;
 class SummaryAction {
-    async execute(config, context) {
+    async execute(config, _context) {
         const cfg = config;
         try {
             // TODO: Integrate with summary generation system

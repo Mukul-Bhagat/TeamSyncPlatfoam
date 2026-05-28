@@ -13,10 +13,10 @@ export declare class ManualTrigger implements ITrigger {
     private config;
     private metadata;
     constructor(config: ManualTriggerConfig);
-    match(event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult>;
+    match(_event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult>;
     evaluate(event?: unknown, context?: Record<string, unknown>): Promise<boolean>;
     getMetadata(): TriggerMetadata;
-    validate(config: Record<string, unknown>): boolean;
+    validate(_config: Record<string, unknown>): boolean;
     private evaluateConditions;
     private getNestedValue;
     private evaluateCondition;

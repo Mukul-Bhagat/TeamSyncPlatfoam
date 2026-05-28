@@ -4,22 +4,29 @@ exports.ScheduleTrigger = void 0;
 class ScheduleTrigger {
     config;
     metadata;
-    lastTriggerTime = null;
+    _lastTriggerTime = null;
     constructor(config) {
         this.config = config;
         this.metadata = {
             type: 'schedule',
-            config,
+            config: config,
             enabled: true,
         };
     }
-    async match(event, context) {
+    async match(_event, context) {
         const now = new Date();
         const timezone = this.config.timezone || 'UTC';
         // Simple cron-like evaluation (can be replaced with a proper cron library)
         const shouldTrigger = this.evaluateSchedule(now, this.config.schedule_expression);
         if (!shouldTrigger) {
             return { matched: false, reason: 'Schedule not due' };
+        }
+        // Prevent too frequent triggers
+        if (this._lastTriggerTime) {
+            const timeSinceLastTrigger = now.getTime() - this._lastTriggerTime.getTime();
+            if (timeSinceLastTrigger < 1000) {
+                return { matched: false, reason: 'Triggered too recently' };
+            }
         }
         // Check conditions
         if (this.config.conditions && this.config.conditions.length > 0) {
@@ -28,7 +35,7 @@ class ScheduleTrigger {
                 return { matched: false, reason: 'Conditions not met' };
             }
         }
-        this.lastTriggerTime = now;
+        this._lastTriggerTime = now;
         return {
             matched: true,
             context: {

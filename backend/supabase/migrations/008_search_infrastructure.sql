@@ -4,6 +4,9 @@
 -- Enable pgvector extension
 CREATE EXTENSION IF NOT EXISTS vector;
 
+-- Enable pg_trgm for trigram text search (must be before using gin_trgm_ops)
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 -- Search Documents Table
 CREATE TABLE IF NOT EXISTS search_documents (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -70,9 +73,6 @@ CREATE INDEX idx_memory_entities_importance ON memory_entities(importance_score 
 CREATE INDEX idx_memory_entities_source ON memory_entities(source_entity_type, source_entity_id);
 CREATE INDEX idx_memory_entities_created ON memory_entities(created_at DESC);
 CREATE INDEX idx_memory_entities_embedding ON memory_entities USING ivfflat(embedding vector_cosine_ops) WITH (lists = 100);
-
--- Enable pg_trgm for trigram text search
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 -- Row Level Security Policies
 

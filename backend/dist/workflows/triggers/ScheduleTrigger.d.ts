@@ -12,9 +12,9 @@ export interface ScheduleCondition {
 export declare class ScheduleTrigger implements ITrigger {
     private config;
     private metadata;
-    private lastTriggerTime;
+    private _lastTriggerTime;
     constructor(config: ScheduleTriggerConfig);
-    match(event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult>;
+    match(_event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult>;
     evaluate(event?: unknown, context?: Record<string, unknown>): Promise<boolean>;
     getMetadata(): TriggerMetadata;
     validate(config: Record<string, unknown>): boolean;

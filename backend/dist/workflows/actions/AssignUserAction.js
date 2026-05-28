@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssignUserAction = void 0;
 class AssignUserAction {
-    async execute(config, context) {
+    async execute(config, _context) {
         const cfg = config;
         try {
             // TODO: Integrate with assignment system

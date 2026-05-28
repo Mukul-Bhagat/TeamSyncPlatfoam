@@ -21,12 +21,12 @@ export class AITrigger implements ITrigger {
     this.config = config;
     this.metadata = {
       type: 'AI',
-      config,
+      config: config as Record<string, unknown>,
       enabled: true,
     };
   }
 
-  async match(event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult> {
+  async match(_event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult> {
     if (!context) {
       return { matched: false, reason: 'No context provided' };
     }
@@ -43,7 +43,7 @@ export class AITrigger implements ITrigger {
     }
 
     // Check confidence threshold if specified
-    if (this.config.confidence_threshold && context.confidence) {
+    if (this.config.confidence_threshold && typeof context.confidence === 'number') {
       if (context.confidence < this.config.confidence_threshold) {
         return { matched: false, reason: 'Confidence below threshold' };
       }
@@ -83,7 +83,7 @@ export class AITrigger implements ITrigger {
     return this.metadata;
   }
 
-  validate(config: Record<string, unknown>): boolean {
+  validate(_config: Record<string, unknown>): boolean {
     // AI triggers have minimal validation
     return true;
   }
@@ -99,7 +99,7 @@ export class AITrigger implements ITrigger {
   }
 
   private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private evaluateCondition(value: unknown, operator: string, expected?: unknown): boolean {

@@ -1,4 +1,4 @@
-import type { EcosystemEvent } from '../../../types';
+import type { EcosystemEvent } from '../../types';
 export interface TriggerMatchResult {
     matched: boolean;
     context?: Record<string, unknown>;

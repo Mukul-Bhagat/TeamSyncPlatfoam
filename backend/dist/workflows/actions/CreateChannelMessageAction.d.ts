@@ -6,7 +6,7 @@ export interface CreateChannelMessageConfig {
     metadata?: Record<string, unknown>;
 }
 export declare class CreateChannelMessageAction implements IWorkflowAction {
-    execute(config: Record<string, unknown>, context: Record<string, unknown>): Promise<ActionResult>;
+    execute(config: Record<string, unknown>, _context: Record<string, unknown>): Promise<ActionResult>;
     validate(config: Record<string, unknown>): boolean;
     getSchema(): ActionSchema;
 }

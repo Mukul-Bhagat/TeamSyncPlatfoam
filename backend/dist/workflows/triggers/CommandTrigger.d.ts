@@ -13,7 +13,7 @@ export declare class CommandTrigger implements ITrigger {
     private config;
     private metadata;
     constructor(config: CommandTriggerConfig);
-    match(event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult>;
+    match(_event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult>;
     evaluate(event?: unknown, context?: Record<string, unknown>): Promise<boolean>;
     getMetadata(): TriggerMetadata;
     validate(config: Record<string, unknown>): boolean;

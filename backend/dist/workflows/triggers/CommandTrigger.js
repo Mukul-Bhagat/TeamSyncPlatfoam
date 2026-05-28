@@ -8,11 +8,11 @@ class CommandTrigger {
         this.config = config;
         this.metadata = {
             type: 'command',
-            config,
+            config: config,
             enabled: true,
         };
     }
-    async match(event, context) {
+    async match(_event, context) {
         if (!context) {
             return { matched: false, reason: 'No context provided' };
         }

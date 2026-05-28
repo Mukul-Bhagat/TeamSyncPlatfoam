@@ -139,6 +139,7 @@ ALTER TABLE public.command_capabilities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_capabilities ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for workflows
+DROP POLICY IF EXISTS "Users can view workflows in their organization" ON public.workflows;
 CREATE POLICY "Users can view workflows in their organization" ON public.workflows
   FOR SELECT USING (
     organization_id IN (
@@ -152,6 +153,7 @@ CREATE POLICY "Users can view workflows in their organization" ON public.workflo
     )
   );
 
+DROP POLICY IF EXISTS "Organization members can create workflows" ON public.workflows;
 CREATE POLICY "Organization members can create workflows" ON public.workflows
   FOR INSERT WITH CHECK (
     organization_id IN (
@@ -165,6 +167,7 @@ CREATE POLICY "Organization members can create workflows" ON public.workflows
     )
   );
 
+DROP POLICY IF EXISTS "Workflow creators can update workflows" ON public.workflows;
 CREATE POLICY "Workflow creators can update workflows" ON public.workflows
   FOR UPDATE USING (
     created_by = auth.uid()
@@ -180,6 +183,7 @@ CREATE POLICY "Workflow creators can update workflows" ON public.workflows
     )
   );
 
+DROP POLICY IF EXISTS "Workflow creators or admins can delete workflows" ON public.workflows;
 CREATE POLICY "Workflow creators or admins can delete workflows" ON public.workflows
   FOR DELETE USING (
     created_by = auth.uid()
@@ -196,6 +200,7 @@ CREATE POLICY "Workflow creators or admins can delete workflows" ON public.workf
   );
 
 -- RLS Policies for workflow_executions
+DROP POLICY IF EXISTS "Users can view executions in their organization" ON public.workflow_executions;
 CREATE POLICY "Users can view executions in their organization" ON public.workflow_executions
   FOR SELECT USING (
     workflow_id IN (
@@ -212,13 +217,16 @@ CREATE POLICY "Users can view executions in their organization" ON public.workfl
     )
   );
 
+DROP POLICY IF EXISTS "Service can insert executions" ON public.workflow_executions;
 CREATE POLICY "Service can insert executions" ON public.workflow_executions
   FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Service can update executions" ON public.workflow_executions;
 CREATE POLICY "Service can update executions" ON public.workflow_executions
   FOR UPDATE WITH CHECK (true);
 
 -- RLS Policies for workflow_actions
+DROP POLICY IF EXISTS "Users can view actions in their organization" ON public.workflow_actions;
 CREATE POLICY "Users can view actions in their organization" ON public.workflow_actions
   FOR SELECT USING (
     workflow_id IN (
@@ -235,10 +243,12 @@ CREATE POLICY "Users can view actions in their organization" ON public.workflow_
     )
   );
 
+DROP POLICY IF EXISTS "Service can manage actions" ON public.workflow_actions;
 CREATE POLICY "Service can manage actions" ON public.workflow_actions
   FOR ALL WITH CHECK (true);
 
 -- RLS Policies for workflow_approvals
+DROP POLICY IF EXISTS "Users can view approvals in their organization" ON public.workflow_approvals;
 CREATE POLICY "Users can view approvals in their organization" ON public.workflow_approvals
   FOR SELECT USING (
     workflow_execution_id IN (
@@ -258,6 +268,7 @@ CREATE POLICY "Users can view approvals in their organization" ON public.workflo
     )
   );
 
+DROP POLICY IF EXISTS "Users can create approvals" ON public.workflow_approvals;
 CREATE POLICY "Users can create approvals" ON public.workflow_approvals
   FOR INSERT WITH CHECK (
     approver_id = auth.uid()
@@ -278,12 +289,14 @@ CREATE POLICY "Users can create approvals" ON public.workflow_approvals
     )
   );
 
+DROP POLICY IF EXISTS "Approvers can update approvals" ON public.workflow_approvals;
 CREATE POLICY "Approvers can update approvals" ON public.workflow_approvals
   FOR UPDATE USING (
     approver_id = auth.uid()
   );
 
 -- RLS Policies for workflow_schedules
+DROP POLICY IF EXISTS "Users can view schedules in their organization" ON public.workflow_schedules;
 CREATE POLICY "Users can view schedules in their organization" ON public.workflow_schedules
   FOR SELECT USING (
     workflow_id IN (
@@ -300,20 +313,25 @@ CREATE POLICY "Users can view schedules in their organization" ON public.workflo
     )
   );
 
+DROP POLICY IF EXISTS "Service can manage schedules" ON public.workflow_schedules;
 CREATE POLICY "Service can manage schedules" ON public.workflow_schedules
   FOR ALL WITH CHECK (true);
 
 -- RLS Policies for command_capabilities
+DROP POLICY IF EXISTS "Everyone can view command capabilities" ON public.command_capabilities;
 CREATE POLICY "Everyone can view command capabilities" ON public.command_capabilities
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Service can manage command capabilities" ON public.command_capabilities;
 CREATE POLICY "Service can manage command capabilities" ON public.command_capabilities
   FOR ALL WITH CHECK (true);
 
 -- RLS Policies for user_capabilities
+DROP POLICY IF EXISTS "Users can view their own capabilities" ON public.user_capabilities;
 CREATE POLICY "Users can view their own capabilities" ON public.user_capabilities
   FOR SELECT USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can view capabilities in their organization" ON public.user_capabilities;
 CREATE POLICY "Users can view capabilities in their organization" ON public.user_capabilities
   FOR SELECT USING (
     user_id IN (
@@ -325,6 +343,7 @@ CREATE POLICY "Users can view capabilities in their organization" ON public.user
     )
   );
 
+DROP POLICY IF EXISTS "Service can manage user capabilities" ON public.user_capabilities;
 CREATE POLICY "Service can manage user capabilities" ON public.user_capabilities
   FOR ALL WITH CHECK (true);
 
@@ -338,10 +357,12 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger for updated_at on workflows
+DROP TRIGGER IF EXISTS update_workflows_updated_at ON public.workflows;
 CREATE TRIGGER update_workflows_updated_at BEFORE UPDATE ON public.workflows
   FOR EACH ROW EXECUTE FUNCTION public.update_workflow_updated_at();
 
 -- Trigger for updated_at on workflow_schedules
+DROP TRIGGER IF EXISTS update_workflow_schedules_updated_at ON public.workflow_schedules;
 CREATE TRIGGER update_workflow_schedules_updated_at BEFORE UPDATE ON public.workflow_schedules
   FOR EACH ROW EXECUTE FUNCTION public.update_workflow_updated_at();
 
@@ -354,3 +375,6 @@ BEGIN
   AND expires_at < timezone('utc'::text, now());
 END;
 $$ LANGUAGE plpgsql;
+
+-- Grant execute permission on cleanup function to service role
+GRANT EXECUTE ON FUNCTION public.cleanup_expired_capabilities() TO service_role;

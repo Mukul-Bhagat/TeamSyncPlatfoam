@@ -10,8 +10,8 @@ export interface IncidentConfig {
 }
 
 export class IncidentAction implements IWorkflowAction {
-  async execute(config: Record<string, unknown>, context: Record<string, unknown>): Promise<ActionResult> {
-    const cfg = config as IncidentConfig;
+  async execute(config: Record<string, unknown>, _context: Record<string, unknown>): Promise<ActionResult> {
+    const cfg = config as unknown as IncidentConfig;
 
     try {
       // TODO: Integrate with incident system
@@ -40,7 +40,7 @@ export class IncidentAction implements IWorkflowAction {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as IncidentConfig;
+    const cfg = config as unknown as IncidentConfig;
     return !!(cfg.title && cfg.severity);
   }
 

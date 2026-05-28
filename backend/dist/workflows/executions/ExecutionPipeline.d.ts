@@ -1,4 +1,4 @@
-import type { EcosystemEvent } from '../../../types';
+import type { EcosystemEvent } from '../../types';
 export interface PipelineContext {
     trigger_event?: EcosystemEvent;
     user_id?: string;
@@ -9,8 +9,6 @@ export interface PipelineContext {
 export declare class ExecutionPipeline {
     private static instance;
     private workflowEngine;
-    private triggerEngine;
-    private actionExecutor;
     private stateTracker;
     private logger;
     private eventBus;

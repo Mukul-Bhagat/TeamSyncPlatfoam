@@ -9,8 +9,8 @@ export interface SummaryConfig {
 }
 
 export class SummaryAction implements IWorkflowAction {
-  async execute(config: Record<string, unknown>, context: Record<string, unknown>): Promise<ActionResult> {
-    const cfg = config as SummaryConfig;
+  async execute(config: Record<string, unknown>, _context: Record<string, unknown>): Promise<ActionResult> {
+    const cfg = config as unknown as SummaryConfig;
 
     try {
       // TODO: Integrate with summary generation system
@@ -40,7 +40,7 @@ export class SummaryAction implements IWorkflowAction {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as SummaryConfig;
+    const cfg = config as unknown as SummaryConfig;
     return !!(cfg.target_type && typeof cfg.target_type === 'string');
   }
 

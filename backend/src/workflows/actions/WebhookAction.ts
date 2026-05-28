@@ -10,8 +10,8 @@ export interface WebhookConfig {
 }
 
 export class WebhookAction implements IWorkflowAction {
-  async execute(config: Record<string, unknown>, context: Record<string, unknown>): Promise<ActionResult> {
-    const cfg = config as WebhookConfig;
+  async execute(config: Record<string, unknown>, _context: Record<string, unknown>): Promise<ActionResult> {
+    const cfg = config as unknown as WebhookConfig;
 
     try {
       const controller = new AbortController();
@@ -50,7 +50,7 @@ export class WebhookAction implements IWorkflowAction {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as WebhookConfig;
+    const cfg = config as unknown as WebhookConfig;
     return !!(cfg.url && typeof cfg.url === 'string');
   }
 

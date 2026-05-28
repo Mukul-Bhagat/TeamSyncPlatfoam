@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebhookAction = void 0;
 class WebhookAction {
-    async execute(config, context) {
+    async execute(config, _context) {
         const cfg = config;
         try {
             const controller = new AbortController();

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IncidentAction = void 0;
 class IncidentAction {
-    async execute(config, context) {
+    async execute(config, _context) {
         const cfg = config;
         try {
             // TODO: Integrate with incident system

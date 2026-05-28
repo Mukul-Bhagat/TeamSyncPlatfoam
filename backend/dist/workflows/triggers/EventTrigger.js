@@ -8,11 +8,11 @@ class EventTrigger {
         this.config = config;
         this.metadata = {
             type: 'event',
-            config,
+            config: config,
             enabled: true,
         };
     }
-    async match(event, context) {
+    async match(event, _context) {
         if (!event) {
             return { matched: false, reason: 'No event provided' };
         }

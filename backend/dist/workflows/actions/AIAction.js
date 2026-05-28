@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AIAction = void 0;
 class AIAction {
-    async execute(config, context) {
+    async execute(config, _context) {
         const cfg = config;
         try {
             // TODO: Integrate with AIOrchestrator

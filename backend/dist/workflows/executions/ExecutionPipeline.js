@@ -2,23 +2,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExecutionPipeline = void 0;
 const WorkflowEngine_1 = require("../engine/WorkflowEngine");
-const TriggerEngine_1 = require("../triggers/TriggerEngine");
-const ActionExecutor_1 = require("../actions/ActionExecutor");
 const WorkflowStateTracker_1 = require("../engine/WorkflowStateTracker");
 const WorkflowLogger_1 = require("../engine/WorkflowLogger");
 const InternalEventBus_1 = require("../../core/event-bus/InternalEventBus");
 class ExecutionPipeline {
     static instance;
     workflowEngine;
-    triggerEngine;
-    actionExecutor;
     stateTracker;
     logger;
     eventBus;
     constructor() {
         this.workflowEngine = WorkflowEngine_1.WorkflowEngine.getInstance();
-        this.triggerEngine = TriggerEngine_1.TriggerEngine.getInstance();
-        this.actionExecutor = new ActionExecutor_1.ActionExecutor();
         this.stateTracker = new WorkflowStateTracker_1.WorkflowStateTracker();
         this.logger = new WorkflowLogger_1.WorkflowLogger();
         this.eventBus = InternalEventBus_1.InternalEventBus.getInstance();
@@ -55,7 +49,7 @@ class ExecutionPipeline {
     /**
      * Validate trigger conditions
      */
-    async validateTrigger(workflowId, context) {
+    async validateTrigger(_workflowId, _context) {
         // Trigger validation is handled by TriggerEngine before execution
         // This is a placeholder for additional validation logic
     }
@@ -73,7 +67,7 @@ class ExecutionPipeline {
     /**
      * Send notifications based on execution result
      */
-    async sendNotifications(execution, context) {
+    async sendNotifications(_execution, _context) {
         // TODO: Integrate with notification system
         // Send notifications for:
         // - Workflow started

@@ -20,12 +20,12 @@ export class ManualTrigger implements ITrigger {
     this.config = config;
     this.metadata = {
       type: 'manual',
-      config,
+      config: config as Record<string, unknown>,
       enabled: true,
     };
   }
 
-  async match(event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult> {
+  async match(_event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult> {
     // Manual triggers are always matched when explicitly triggered
     // The actual authorization happens at the execution level
 
@@ -56,7 +56,7 @@ export class ManualTrigger implements ITrigger {
     return this.metadata;
   }
 
-  validate(config: Record<string, unknown>): boolean {
+  validate(_config: Record<string, unknown>): boolean {
     // Manual triggers have minimal validation
     return true;
   }
@@ -72,7 +72,7 @@ export class ManualTrigger implements ITrigger {
   }
 
   private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private evaluateCondition(value: unknown, operator: string, expected?: unknown): boolean {

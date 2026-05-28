@@ -8,11 +8,11 @@ class ManualTrigger {
         this.config = config;
         this.metadata = {
             type: 'manual',
-            config,
+            config: config,
             enabled: true,
         };
     }
-    async match(event, context) {
+    async match(_event, context) {
         // Manual triggers are always matched when explicitly triggered
         // The actual authorization happens at the execution level
         // Check conditions if provided
@@ -38,7 +38,7 @@ class ManualTrigger {
     getMetadata() {
         return this.metadata;
     }
-    validate(config) {
+    validate(_config) {
         // Manual triggers have minimal validation
         return true;
     }

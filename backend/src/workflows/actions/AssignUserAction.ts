@@ -10,8 +10,8 @@ export interface AssignUserConfig {
 }
 
 export class AssignUserAction implements IWorkflowAction {
-  async execute(config: Record<string, unknown>, context: Record<string, unknown>): Promise<ActionResult> {
-    const cfg = config as AssignUserConfig;
+  async execute(config: Record<string, unknown>, _context: Record<string, unknown>): Promise<ActionResult> {
+    const cfg = config as unknown as AssignUserConfig;
 
     try {
       // TODO: Integrate with assignment system
@@ -41,7 +41,7 @@ export class AssignUserAction implements IWorkflowAction {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as AssignUserConfig;
+    const cfg = config as unknown as AssignUserConfig;
     return !!(cfg.user_id && cfg.entity_type && cfg.entity_id);
   }
 

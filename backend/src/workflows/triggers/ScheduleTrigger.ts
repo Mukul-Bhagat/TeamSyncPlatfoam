@@ -15,18 +15,18 @@ export interface ScheduleCondition {
 export class ScheduleTrigger implements ITrigger {
   private config: ScheduleTriggerConfig;
   private metadata: TriggerMetadata;
-  private lastTriggerTime: Date | null = null;
+  private _lastTriggerTime: Date | null = null;
 
   constructor(config: ScheduleTriggerConfig) {
     this.config = config;
     this.metadata = {
       type: 'schedule',
-      config,
+      config: config as unknown as Record<string, unknown>,
       enabled: true,
     };
   }
 
-  async match(event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult> {
+  async match(_event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult> {
     const now = new Date();
     const timezone = this.config.timezone || 'UTC';
 
@@ -37,6 +37,14 @@ export class ScheduleTrigger implements ITrigger {
       return { matched: false, reason: 'Schedule not due' };
     }
 
+    // Prevent too frequent triggers
+    if (this._lastTriggerTime) {
+      const timeSinceLastTrigger = now.getTime() - this._lastTriggerTime.getTime();
+      if (timeSinceLastTrigger < 1000) {
+        return { matched: false, reason: 'Triggered too recently' };
+      }
+    }
+
     // Check conditions
     if (this.config.conditions && this.config.conditions.length > 0) {
       const conditionsMatch = this.evaluateConditions(context || {}, this.config.conditions);
@@ -45,7 +53,7 @@ export class ScheduleTrigger implements ITrigger {
       }
     }
 
-    this.lastTriggerTime = now;
+    this._lastTriggerTime = now;
 
     return {
       matched: true,
@@ -67,7 +75,7 @@ export class ScheduleTrigger implements ITrigger {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as ScheduleTriggerConfig;
+    const cfg = config as unknown as ScheduleTriggerConfig;
     return !!(cfg.schedule_expression && typeof cfg.schedule_expression === 'string');
   }
 
@@ -148,7 +156,7 @@ export class ScheduleTrigger implements ITrigger {
   }
 
   private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private evaluateCondition(value: unknown, operator: string, expected?: unknown): boolean {

@@ -9,8 +9,8 @@ export interface NotificationConfig {
 }
 
 export class NotificationAction implements IWorkflowAction {
-  async execute(config: Record<string, unknown>, context: Record<string, unknown>): Promise<ActionResult> {
-    const cfg = config as NotificationConfig;
+  async execute(config: Record<string, unknown>, _context: Record<string, unknown>): Promise<ActionResult> {
+    const cfg = config as unknown as NotificationConfig;
 
     try {
       // TODO: Integrate with notification system
@@ -38,7 +38,7 @@ export class NotificationAction implements IWorkflowAction {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as NotificationConfig;
+    const cfg = config as unknown as NotificationConfig;
     return !!(cfg.recipient && cfg.message);
   }
 

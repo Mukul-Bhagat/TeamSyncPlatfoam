@@ -1,10 +1,8 @@
 import { WorkflowEngine } from '../engine/WorkflowEngine';
-import { TriggerEngine } from '../triggers/TriggerEngine';
-import { ActionExecutor } from '../actions/ActionExecutor';
 import { WorkflowStateTracker } from '../engine/WorkflowStateTracker';
 import { WorkflowLogger } from '../engine/WorkflowLogger';
 import { InternalEventBus } from '../../core/event-bus/InternalEventBus';
-import type { EcosystemEvent } from '../../../types';
+import type { EcosystemEvent } from '../../types';
 
 export interface PipelineContext {
   trigger_event?: EcosystemEvent;
@@ -17,16 +15,12 @@ export interface PipelineContext {
 export class ExecutionPipeline {
   private static instance: ExecutionPipeline;
   private workflowEngine: WorkflowEngine;
-  private triggerEngine: TriggerEngine;
-  private actionExecutor: ActionExecutor;
   private stateTracker: WorkflowStateTracker;
   private logger: WorkflowLogger;
   private eventBus: InternalEventBus;
 
   private constructor() {
     this.workflowEngine = WorkflowEngine.getInstance();
-    this.triggerEngine = TriggerEngine.getInstance();
-    this.actionExecutor = new ActionExecutor();
     this.stateTracker = new WorkflowStateTracker();
     this.logger = new WorkflowLogger();
     this.eventBus = InternalEventBus.getInstance();
@@ -74,7 +68,7 @@ export class ExecutionPipeline {
   /**
    * Validate trigger conditions
    */
-  private async validateTrigger(workflowId: string, context: PipelineContext): Promise<void> {
+  private async validateTrigger(_workflowId: string, _context: PipelineContext): Promise<void> {
     // Trigger validation is handled by TriggerEngine before execution
     // This is a placeholder for additional validation logic
   }
@@ -94,7 +88,7 @@ export class ExecutionPipeline {
   /**
    * Send notifications based on execution result
    */
-  private async sendNotifications(execution: any, context: PipelineContext): Promise<void> {
+  private async sendNotifications(_execution: any, _context: PipelineContext): Promise<void> {
     // TODO: Integrate with notification system
     // Send notifications for:
     // - Workflow started

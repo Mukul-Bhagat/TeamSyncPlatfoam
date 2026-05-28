@@ -8,11 +8,11 @@ class AITrigger {
         this.config = config;
         this.metadata = {
             type: 'AI',
-            config,
+            config: config,
             enabled: true,
         };
     }
-    async match(event, context) {
+    async match(_event, context) {
         if (!context) {
             return { matched: false, reason: 'No context provided' };
         }
@@ -26,7 +26,7 @@ class AITrigger {
             return { matched: false, reason: 'Insight type mismatch' };
         }
         // Check confidence threshold if specified
-        if (this.config.confidence_threshold && context.confidence) {
+        if (this.config.confidence_threshold && typeof context.confidence === 'number') {
             if (context.confidence < this.config.confidence_threshold) {
                 return { matched: false, reason: 'Confidence below threshold' };
             }
@@ -60,7 +60,7 @@ class AITrigger {
     getMetadata() {
         return this.metadata;
     }
-    validate(config) {
+    validate(_config) {
         // AI triggers have minimal validation
         return true;
     }

@@ -1,4 +1,4 @@
-export type EventSeverity = 'info' | 'warning' | 'critical';
+export type EventSeverity = 'info' | 'warning' | 'critical' | 'warn';
 export interface EcosystemEvent {
     id: string;
     source_app: string;

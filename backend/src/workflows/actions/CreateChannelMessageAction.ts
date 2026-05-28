@@ -8,8 +8,8 @@ export interface CreateChannelMessageConfig {
 }
 
 export class CreateChannelMessageAction implements IWorkflowAction {
-  async execute(config: Record<string, unknown>, context: Record<string, unknown>): Promise<ActionResult> {
-    const cfg = config as CreateChannelMessageConfig;
+  async execute(config: Record<string, unknown>, _context: Record<string, unknown>): Promise<ActionResult> {
+    const cfg = config as unknown as CreateChannelMessageConfig;
 
     try {
       // TODO: Integrate with message system
@@ -37,7 +37,7 @@ export class CreateChannelMessageAction implements IWorkflowAction {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as CreateChannelMessageConfig;
+    const cfg = config as unknown as CreateChannelMessageConfig;
     return !!(cfg.channel_id && cfg.message);
   }
 

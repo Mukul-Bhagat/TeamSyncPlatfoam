@@ -1,4 +1,4 @@
-import type { EcosystemEvent } from '../../../types';
+import type { EcosystemEvent } from '../../types';
 export declare class TriggerEngine {
     private static instance;
     private eventBus;

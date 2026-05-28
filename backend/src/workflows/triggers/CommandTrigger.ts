@@ -20,12 +20,12 @@ export class CommandTrigger implements ITrigger {
     this.config = config;
     this.metadata = {
       type: 'command',
-      config,
+      config: config as unknown as Record<string, unknown>,
       enabled: true,
     };
   }
 
-  async match(event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult> {
+  async match(_event?: unknown, context?: Record<string, unknown>): Promise<TriggerMatchResult> {
     if (!context) {
       return { matched: false, reason: 'No context provided' };
     }
@@ -65,7 +65,7 @@ export class CommandTrigger implements ITrigger {
   }
 
   validate(config: Record<string, unknown>): boolean {
-    const cfg = config as CommandTriggerConfig;
+    const cfg = config as unknown as CommandTriggerConfig;
     return !!(cfg.command_name && typeof cfg.command_name === 'string');
   }
 
@@ -80,7 +80,7 @@ export class CommandTrigger implements ITrigger {
   }
 
   private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private evaluateCondition(value: unknown, operator: string, expected?: unknown): boolean {
