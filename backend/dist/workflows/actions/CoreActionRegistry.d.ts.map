@@ -1,0 +1,1 @@
+{"version":3,"file":"CoreActionRegistry.d.ts","sourceRoot":"","sources":["../../../src/workflows/actions/CoreActionRegistry.ts"],"names":[],"mappings":"AASA,qBAAa,kBAAkB;IAC7B,OAAO,CAAC,MAAM,CAAC,QAAQ,CAAqB;IAC5C,OAAO,CAAC,cAAc,CAAiB;IAEvC,OAAO;IAIP,MAAM,CAAC,WAAW,IAAI,kBAAkB;IAOxC;;OAEG;IACH,mBAAmB,IAAI,IAAI;IAU3B;;OAEG;IACH,qBAAqB,IAAI,IAAI;CAS9B"}
