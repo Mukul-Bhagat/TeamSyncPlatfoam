@@ -1,0 +1,35 @@
+{
+  "name": "teamsync-backend",
+  "version": "1.0.0",
+  "description": "TeamSync Backend - Ecosystem Event Bus and Integration Infrastructure",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "event-bus",
+    "integrations",
+    "webhooks",
+    "ecosystem"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^4.26.2",
+    "@fastify/cors": "^8.5.0",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^2.1.0",
+    "zod": "^3.22.4",
+    "@supabase/supabase-js": "^2.39.7",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.19",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "nodemon": "^3.0.3"
+  }
+}

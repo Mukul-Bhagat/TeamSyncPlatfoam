@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { usePanelStore } from '@/store/usePanelStore';
-import { X, ChevronLeft, ChevronRight, Layers, Users, MessageSquare, Calendar, Settings } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Layers, Users, MessageSquare, Calendar, Settings, Plug } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SidebarItem } from './SidebarItem';
 import { OrganizationSwitcher } from '@/components/organization/OrganizationSwitcher';
@@ -47,6 +47,7 @@ export function Sidebar({
     { icon: MessageSquare, label: 'Channels', href: '/channels' },
     { icon: Users, label: 'Team', href: '/team' },
     { icon: Calendar, label: 'Activity', href: '/activity' },
+    { icon: Plug, label: 'Integrations', href: '/integrations' },
     { icon: Settings, label: 'Settings', href: '/settings' },
   ];
 

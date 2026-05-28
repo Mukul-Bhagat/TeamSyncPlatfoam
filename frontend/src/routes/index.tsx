@@ -11,6 +11,7 @@ import { ProjectsPage } from '@/pages/dashboard/ProjectsPage';
 import { SettingsPage } from '@/pages/settings/SettingsPage';
 import { WorkspacePage } from '@/pages/workspace/WorkspacePage';
 import { ChannelPage } from '@/pages/workspace/ChannelPage';
+import { IntegrationCenterPage } from '@/pages/integrations/IntegrationCenterPage';
 
 const router = createBrowserRouter([
   {
@@ -86,6 +87,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <SettingsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/integrations',
+    element: (
+      <ProtectedRoute>
+        <IntegrationCenterPage />
       </ProtectedRoute>
     ),
   },
