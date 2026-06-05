@@ -8,6 +8,7 @@ import {
   WorkspaceActivityRenderer,
   ChannelActivityRenderer,
   UserActivityRenderer,
+  ProjectActivityRenderer,
 } from './renderers';
 
 interface ActivityRendererProps {
@@ -41,6 +42,22 @@ export function ActivityRenderer({ activity }: ActivityRendererProps) {
     case ActivityEventType.CHANNEL_CREATED:
     case ActivityEventType.CHANNEL_UPDATED:
       return <ChannelActivityRenderer activity={activity} />;
+
+    case ActivityEventType.PROJECT_CREATED:
+    case ActivityEventType.PROJECT_UPDATED:
+    case ActivityEventType.PROJECT_DELETED:
+    case ActivityEventType.PROJECT_FEED_POST_CREATED:
+    case ActivityEventType.PROJECT_FEED_POST_UPDATED:
+    case ActivityEventType.PROJECT_FEED_POST_DELETED:
+      return <ProjectActivityRenderer activity={activity} />;
+
+    case ActivityEventType.MEMBER_INVITED:
+    case ActivityEventType.MEMBER_ROLE_UPDATED:
+    case ActivityEventType.MEMBER_SUSPENDED:
+    case ActivityEventType.MEMBER_REACTIVATED:
+    case ActivityEventType.MEMBER_REMOVED:
+    case ActivityEventType.INVITATION_ACCEPTED:
+      return <UserActivityRenderer activity={activity} />;
     
     case ActivityEventType.USER_JOINED_WORKSPACE:
     case ActivityEventType.USER_LEFT_WORKSPACE:

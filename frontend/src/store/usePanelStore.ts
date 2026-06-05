@@ -13,6 +13,9 @@ interface PanelState {
   leftSidebarMobileOpen: boolean;
   rightPanelMobileOpen: boolean;
   
+  // Search modal state
+  searchOpen: boolean;
+  
   // Actions
   toggleLeftSidebar: () => void;
   setLeftSidebarCollapsed: (collapsed: boolean) => void;
@@ -27,6 +30,9 @@ interface PanelState {
   
   toggleRightPanelMobile: () => void;
   setRightPanelMobileOpen: (open: boolean) => void;
+  
+  toggleSearch: () => void;
+  setSearchOpen: (open: boolean) => void;
   
   resetPanels: () => void;
 }
@@ -46,6 +52,8 @@ export const usePanelStore = create<PanelState>((set) => ({
   
   leftSidebarMobileOpen: false,
   rightPanelMobileOpen: false,
+  
+  searchOpen: false,
   
   // Left sidebar actions
   toggleLeftSidebar: () =>
@@ -88,6 +96,15 @@ export const usePanelStore = create<PanelState>((set) => ({
   setRightPanelMobileOpen: (open) =>
     set({ rightPanelMobileOpen: open }),
   
+  // Search modal actions
+  toggleSearch: () =>
+    set((state) => ({
+      searchOpen: !state.searchOpen,
+    })),
+  
+  setSearchOpen: (open) =>
+    set({ searchOpen: open }),
+  
   // Reset to defaults
   resetPanels: () =>
     set({
@@ -97,5 +114,6 @@ export const usePanelStore = create<PanelState>((set) => ({
       rightPanelWidth: defaultPanelWidths.rightPanel,
       leftSidebarMobileOpen: false,
       rightPanelMobileOpen: false,
+      searchOpen: false,
     }),
 }));

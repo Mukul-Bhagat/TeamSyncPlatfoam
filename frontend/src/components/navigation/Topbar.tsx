@@ -1,6 +1,10 @@
 import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, Search, MoreVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { useUnreadCount } from '@/features/notifications/hooks/useNotifications';
+import { usePanelStore } from '@/store/usePanelStore';
 
 interface TopbarProps {
   title?: string;
@@ -10,6 +14,11 @@ interface TopbarProps {
 }
 
 export function Topbar({ title, breadcrumbs, actions, className }: TopbarProps) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { data: unreadCount } = useUnreadCount(user?.id || '');
+  const toggleSearch = usePanelStore((state) => state.toggleSearch);
+
   return (
     <header
       className={cn(
@@ -54,10 +63,12 @@ export function Topbar({ title, breadcrumbs, actions, className }: TopbarProps) 
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search... (⌘K)"
+              onClick={toggleSearch}
+              readOnly
               className={cn(
                 'w-full pl-10 pr-4 py-2',
-                'bg-background border rounded-lg',
+                'bg-background border rounded-lg cursor-pointer',
                 'text-sm text-foreground placeholder:text-muted-foreground',
                 'focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent',
                 'transition-all duration-fast'
@@ -69,6 +80,7 @@ export function Topbar({ title, breadcrumbs, actions, className }: TopbarProps) 
         {/* Right section - Actions */}
         <div className="flex items-center space-x-2 flex-shrink-0">
           <button
+            onClick={() => navigate('/notifications')}
             className={cn(
               'p-2 rounded-lg hover:bg-muted transition-colors duration-fast',
               'relative'
@@ -76,7 +88,9 @@ export function Topbar({ title, breadcrumbs, actions, className }: TopbarProps) 
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5 text-muted-foreground" />
-            <span className="absolute top-1 right-1 h-2 w-2 bg-primary rounded-full" />
+            {unreadCount && unreadCount > 0 && (
+              <span className="absolute top-1 right-1 h-2 w-2 bg-primary rounded-full" />
+            )}
           </button>
           
           {actions}

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useWorkflows } from '../../hooks/useWorkflows';
-import { Button } from '../../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
-import { Badge } from '../../../components/ui/badge';
-import { Plus, Play, Settings, Trash2 } from 'lucide-react';
-import type { Workflow } from '../../types/workflows';
+import { useWorkflows } from '@/hooks/useWorkflows';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Settings, Trash2 } from 'lucide-react';
+import type { Workflow } from '@/types/workflows';
 
 interface WorkflowListProps {
   organizationId: string;

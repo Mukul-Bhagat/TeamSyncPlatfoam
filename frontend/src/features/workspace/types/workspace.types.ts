@@ -1,4 +1,11 @@
-export type WorkspaceRole = 'admin' | 'editor' | 'member' | 'viewer';
+export type WorkspaceRole =
+  | 'owner'
+  | 'admin'
+  | 'manager'
+  | 'lead'
+  | 'developer'
+  | 'viewer'
+  | 'guest';
 
 export interface Workspace {
   id: string;
@@ -17,6 +24,7 @@ export interface WorkspaceMember {
   workspace_id: string;
   user_id: string;
   role: WorkspaceRole;
+  status: 'active' | 'suspended';
   joined_at: string;
   // Joined relations
   user?: {
@@ -31,6 +39,7 @@ export interface WorkspaceMember {
 export interface WorkspaceMemberWithProfile {
   id: string;
   role: WorkspaceRole;
+  status: 'active' | 'suspended';
   joined_at: string;
   user_id: string;
   profiles: {
@@ -38,7 +47,7 @@ export interface WorkspaceMemberWithProfile {
     full_name?: string;
     username?: string;
     avatar_url?: string;
-  }[];
+  };
 }
 
 export interface CreateWorkspaceInput {

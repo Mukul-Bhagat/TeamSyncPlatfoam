@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { activityService } from './activity.service';
 import type {
   Channel,
   ChannelMember,
@@ -9,8 +10,17 @@ import type {
   UpdateChannelMemberRoleInput,
 } from '@/features/channels/types/channel.types';
 
+const recordActivity = (
+  payload: Parameters<typeof activityService.createActivity>[0]
+) => {
+  void activityService.createActivity(payload).catch(() => undefined);
+};
+
 export const channelService = {
   async createChannel(input: CreateChannelInput) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('No authenticated user');
+
     const { data, error } = await supabase
       .from('channels')
       .insert({
@@ -21,7 +31,7 @@ export const channelService = {
         type: input.type,
         visibility: input.visibility,
         icon: input.icon,
-        created_by: (await supabase.auth.getUser()).data.user?.id,
+        created_by: user.id,
       })
       .select()
       .single();
@@ -36,6 +46,22 @@ export const channelService = {
         role: 'admin',
       });
     }
+
+    recordActivity({
+      workspace_id: data.workspace_id,
+      actor_id: user.id,
+      entity_type: 'channel',
+      entity_id: data.id,
+      event_type: 'channel_created',
+      title: `Channel created: ${data.name}`,
+      description: `Created channel ${data.name}`,
+      metadata: {
+        channel_id: data.id,
+        channel_name: data.name,
+        channel_type: data.type,
+        action: 'created channel',
+      },
+    });
 
     return data as Channel;
   },
@@ -133,6 +159,7 @@ export const channelService = {
         channel_id: input.channel_id,
         user_id: input.user_id,
         role: input.role,
+        status: 'active',
       })
       .select()
       .single();
@@ -161,6 +188,26 @@ export const channelService = {
       .single();
 
     if (error) throw error;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      recordActivity({
+        channel_id: channelId,
+        actor_id: user.id,
+        entity_type: 'channel',
+        entity_id: channelId,
+        event_type: 'member_role_updated',
+        title: 'Channel member role updated',
+        description: `Updated channel member role`,
+        metadata: {
+          user_id: userId,
+          user_name: user.email || 'Unknown user',
+          action: 'updated channel member role',
+          role: input.role,
+        },
+      });
+    }
+
     return data as ChannelMember;
   },
 
@@ -170,6 +217,7 @@ export const channelService = {
       .select(`
         id,
         role,
+        status,
         joined_at,
         user_id,
         profiles (

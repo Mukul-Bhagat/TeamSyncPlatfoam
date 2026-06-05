@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { activityService } from './activity.service';
 import type {
   Organization,
   OrganizationMember,
@@ -10,15 +11,24 @@ import type {
   UpdateMemberRoleInput,
 } from '@/features/organization/types/organization.types';
 
+const recordActivity = (
+  payload: Parameters<typeof activityService.createActivity>[0]
+) => {
+  void activityService.createActivity(payload).catch(() => undefined);
+};
+
 export const organizationService = {
   async createOrganization(input: CreateOrganizationInput) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('No authenticated user');
+
     const { data, error } = await supabase
       .from('organizations')
       .insert({
         name: input.name,
         slug: input.slug,
         logo_url: input.logo_url,
-        owner_id: (await supabase.auth.getUser()).data.user?.id,
+        owner_id: user.id,
       })
       .select()
       .single();
@@ -30,6 +40,21 @@ export const organizationService = {
       organization_id: data.id,
       user_id: data.owner_id,
       role: 'owner',
+    });
+
+    recordActivity({
+      organization_id: data.id,
+      actor_id: user.id,
+      entity_type: 'organization',
+      entity_id: data.id,
+      event_type: 'organization_created',
+      title: `Organization created: ${data.name}`,
+      description: `Created organization ${data.name}`,
+      metadata: {
+        user_id: user.id,
+        user_name: user.email || 'Unknown user',
+        action: 'created organization',
+      },
     });
 
     return data as Organization;
@@ -63,6 +88,7 @@ export const organizationService = {
       .select(`
         organization_id,
         role,
+        status,
         organizations (
           id,
           name,
@@ -104,6 +130,7 @@ export const organizationService = {
         organization_id: input.organization_id,
         user_id: input.user_id,
         role: input.role,
+        status: 'active',
       })
       .select()
       .single();
@@ -132,6 +159,26 @@ export const organizationService = {
       .single();
 
     if (error) throw error;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      recordActivity({
+        organization_id: organizationId,
+        actor_id: user.id,
+        entity_type: 'organization',
+        entity_id: organizationId,
+        event_type: 'member_role_updated' as any,
+        title: 'Organization member role updated',
+        description: `Updated member role in organization`,
+        metadata: {
+          user_id: userId,
+          user_name: user.email || 'Unknown user',
+          action: 'updated member role',
+          role: input.role,
+        },
+      });
+    }
+
     return data as OrganizationMember;
   },
 
@@ -141,6 +188,7 @@ export const organizationService = {
       .select(`
         id,
         role,
+        status,
         joined_at,
         user_id,
         profiles (

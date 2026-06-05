@@ -44,6 +44,7 @@ export interface ChannelMember {
   channel_id: string;
   user_id: string;
   role: ChannelRole;
+  status: 'active' | 'suspended';
   joined_at: string;
   // Joined relations
   user?: {
@@ -58,6 +59,7 @@ export interface ChannelMember {
 export interface ChannelMemberWithProfile {
   id: string;
   role: ChannelRole;
+  status: 'active' | 'suspended';
   joined_at: string;
   user_id: string;
   profiles: {
@@ -65,7 +67,7 @@ export interface ChannelMemberWithProfile {
     full_name?: string;
     username?: string;
     avatar_url?: string;
-  }[];
+  };
 }
 
 export interface CreateChannelInput {

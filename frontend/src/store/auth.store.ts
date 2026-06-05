@@ -2,6 +2,23 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { AuthState, AuthUser, AuthSession } from '@/features/auth/types/auth.types';
 import { authService } from '@/services/auth.service';
+import { projectService } from '@/services/project.service';
+import { queryClient } from '@/providers/QueryProvider';
+
+async function syncProjectInvitations() {
+  try {
+    const claimedInvitations = await projectService.claimPendingInvitations();
+
+    if (claimedInvitations.length > 0) {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['projects'] }),
+        queryClient.invalidateQueries({ queryKey: ['project'] }),
+      ]);
+    }
+  } catch (error) {
+    console.error('Failed to claim project invitations:', error);
+  }
+}
 
 interface AuthStore extends AuthState {
   setUser: (user: AuthUser | null) => void;
@@ -38,6 +55,7 @@ export const useAuthStore = create<AuthStore>()(
               user: sessionResponse.data.user as AuthUser,
               session: sessionResponse.data as AuthSession,
             });
+            await syncProjectInvitations();
           }
         } catch (error) {
           console.error('Failed to initialize auth:', error);
@@ -61,6 +79,7 @@ export const useAuthStore = create<AuthStore>()(
               session: sessionResponse.data as AuthSession,
               loading: false,
             });
+            await syncProjectInvitations();
           } else {
             set({ user: response.data as AuthUser, loading: false });
           }
@@ -85,6 +104,7 @@ export const useAuthStore = create<AuthStore>()(
               session: sessionResponse.data as AuthSession,
               loading: false,
             });
+            await syncProjectInvitations();
           } else {
             set({ user: response.data as AuthUser, loading: false });
           }

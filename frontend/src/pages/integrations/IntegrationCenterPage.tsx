@@ -28,6 +28,7 @@ import {
   useEventStats,
 } from '@/features/integrations/hooks/useIntegrations';
 import type { IntegrationHealthStatus } from '@/features/integrations/types/integration.types';
+import { useOrganizations } from '@/features/organization/hooks/useOrganizations';
 
 type Tab = 'overview' | 'connected' | 'webhooks' | 'logs';
 
@@ -79,7 +80,10 @@ function SeverityBadge({ severity }: { severity: 'info' | 'warning' | 'critical'
 export function IntegrationCenterPage() {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [eventFilter, setEventFilter] = useState<string>('all');
-  const organizationId = '00000000-0000-0000-0000-000000000000'; // Placeholder: use auth context in production
+  
+  // Get real organizationId from organizations
+  const { data: organizations } = useOrganizations();
+  const organizationId = organizations?.[0]?.organization_id || '';
 
   const { data: integrations, isLoading: integrationsLoading } = useIntegrations(organizationId);
   const { data: eventLogs, isLoading: logsLoading } = useEventLogs(organizationId, { limit: 50 });

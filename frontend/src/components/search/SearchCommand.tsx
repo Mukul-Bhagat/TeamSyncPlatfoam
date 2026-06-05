@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSearch } from '@/features/search/hooks/useSearch';
-import { Search, X, ChevronRight, MessageSquare, AlertTriangle, Rocket, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, X, ChevronRight, MessageSquare, AlertTriangle, Rocket, FileText, FolderKanban } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSearch } from '@/features/search/hooks/useSearch';
 import type { SearchResult } from '@/features/search/types/search.types';
+import { useWorkspaceContextStore } from '@/store/workspace-context.store';
 
 interface SearchCommandProps {
   organizationId: string;
@@ -14,6 +16,8 @@ interface SearchCommandProps {
 export function SearchCommand({ organizationId, workspaceId, isOpen, onClose }: SearchCommandProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const navigate = useNavigate();
+  const { setOrganizationId, setWorkspaceId, setProjectId } = useWorkspaceContextStore();
 
   const { data: searchResults, isLoading } = useSearch(
     {
@@ -28,36 +32,68 @@ export function SearchCommand({ organizationId, workspaceId, isOpen, onClose }: 
 
   const results = searchResults?.results || [];
 
-  // Reset selection when results change
   useEffect(() => {
     setSelectedIndex(0);
   }, [results]);
 
-  // Handle keyboard navigation
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (!isOpen) return;
+  const handleSelectResult = useCallback(
+    (result: SearchResult) => {
+      const metadata = result.metadata as Record<string, unknown>;
 
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex((prev) => Math.min(prev + 1, results.length - 1));
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex((prev) => Math.max(prev - 1, 0));
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (results[selectedIndex]) {
-          handleSelectResult(results[selectedIndex]);
+      if (result.entity_type === 'project') {
+        if (typeof metadata.organization_id === 'string') {
+          setOrganizationId(metadata.organization_id);
         }
-        break;
-      case 'Escape':
-        e.preventDefault();
-        onClose();
-        break;
-    }
-  }, [isOpen, results, selectedIndex, onClose]);
+        if (typeof metadata.workspace_id === 'string') {
+          setWorkspaceId(metadata.workspace_id);
+        }
+        setProjectId(result.entity_id);
+        navigate(`/projects/${result.entity_id}`);
+      } else if (result.entity_type === 'channel' && typeof metadata.workspace_id === 'string') {
+        setWorkspaceId(metadata.workspace_id);
+        navigate(`/workspace/${metadata.workspace_id}/channel/${result.entity_id}`);
+      } else if (result.entity_type === 'workspace') {
+        if (typeof metadata.organization_id === 'string') {
+          setOrganizationId(metadata.organization_id);
+        }
+        if (typeof metadata.workspace_id === 'string') {
+          setWorkspaceId(metadata.workspace_id);
+        }
+        navigate('/workspace');
+      }
+
+      onClose();
+    },
+    [navigate, onClose, setOrganizationId, setProjectId, setWorkspaceId]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!isOpen) return;
+
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+          setSelectedIndex((previous) => Math.min(previous + 1, results.length - 1));
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          setSelectedIndex((previous) => Math.max(previous - 1, 0));
+          break;
+        case 'Enter':
+          event.preventDefault();
+          if (results[selectedIndex]) {
+            handleSelectResult(results[selectedIndex]);
+          }
+          break;
+        case 'Escape':
+          event.preventDefault();
+          onClose();
+          break;
+      }
+    },
+    [isOpen, onClose, results, selectedIndex, handleSelectResult]
+  );
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -74,6 +110,8 @@ export function SearchCommand({ organizationId, workspaceId, isOpen, onClose }: 
         return Rocket;
       case 'summary':
         return FileText;
+      case 'project':
+        return FolderKanban;
       default:
         return Search;
     }
@@ -89,15 +127,11 @@ export function SearchCommand({ organizationId, workspaceId, isOpen, onClose }: 
         return 'text-green-500';
       case 'summary':
         return 'text-purple-500';
+      case 'project':
+        return 'text-violet-500';
       default:
         return 'text-gray-500';
     }
-  };
-
-  const handleSelectResult = (result: SearchResult) => {
-    console.log('Selected result:', result);
-    // TODO: Navigate to the result
-    onClose();
   };
 
   const groupedResults = results.reduce((acc, result) => {
@@ -112,19 +146,16 @@ export function SearchCommand({ organizationId, workspaceId, isOpen, onClose }: 
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]">
-      {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-      {/* Search Modal */}
       <div className="relative w-full max-w-2xl bg-card border rounded-xl shadow-2xl overflow-hidden">
-        {/* Search Input */}
         <div className="flex items-center gap-3 p-4 border-b">
           <Search className="h-5 w-5 text-muted-foreground" />
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search messages, incidents, deployments, summaries..."
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search projects, messages, incidents, and more..."
             className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
             autoFocus
           />
@@ -137,12 +168,9 @@ export function SearchCommand({ organizationId, workspaceId, isOpen, onClose }: 
           </button>
         </div>
 
-        {/* Results */}
         <div className="max-h-[60vh] overflow-y-auto">
           {isLoading && query.length >= 2 && (
-            <div className="p-8 text-center text-muted-foreground">
-              Searching...
-            </div>
+            <div className="p-8 text-center text-muted-foreground">Searching...</div>
           )}
 
           {!isLoading && query.length >= 2 && results.length === 0 && (
@@ -167,9 +195,10 @@ export function SearchCommand({ organizationId, workspaceId, isOpen, onClose }: 
                       <Icon className={cn('h-3 w-3', getEntityColor(entityType))} />
                       {entityType}
                     </div>
-                    {items.map((result, idx) => {
+                    {items.map((result) => {
                       const globalIndex = results.indexOf(result);
                       const ResultIcon = getEntityIcon(result.entity_type);
+
                       return (
                         <button
                           key={result.id}
@@ -195,7 +224,6 @@ export function SearchCommand({ organizationId, workspaceId, isOpen, onClose }: 
           )}
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-between px-4 py-2 border-t text-xs text-muted-foreground">
           <div className="flex items-center gap-4">
             <span>↑↓ to navigate</span>
@@ -203,7 +231,9 @@ export function SearchCommand({ organizationId, workspaceId, isOpen, onClose }: 
             <span>esc to close</span>
           </div>
           {results.length > 0 && (
-            <span>{results.length} result{results.length !== 1 ? 's' : ''}</span>
+            <span>
+              {results.length} result{results.length !== 1 ? 's' : ''}
+            </span>
           )}
         </div>
       </div>

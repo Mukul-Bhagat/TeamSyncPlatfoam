@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { activityService } from './activity.service';
 import type {
   Workspace,
   WorkspaceMember,
@@ -9,8 +10,17 @@ import type {
   UpdateWorkspaceMemberRoleInput,
 } from '@/features/workspace/types/workspace.types';
 
+const recordActivity = (
+  payload: Parameters<typeof activityService.createActivity>[0]
+) => {
+  void activityService.createActivity(payload).catch(() => undefined);
+};
+
 export const workspaceService = {
   async createWorkspace(input: CreateWorkspaceInput) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('No authenticated user');
+
     const { data, error } = await supabase
       .from('workspaces')
       .insert({
@@ -19,7 +29,7 @@ export const workspaceService = {
         slug: input.slug,
         description: input.description,
         icon: input.icon,
-        created_by: (await supabase.auth.getUser()).data.user?.id,
+        created_by: user.id,
       })
       .select()
       .single();
@@ -31,6 +41,22 @@ export const workspaceService = {
       workspace_id: data.id,
       user_id: data.created_by,
       role: 'admin',
+    });
+
+    recordActivity({
+      organization_id: data.organization_id,
+      workspace_id: data.id,
+      actor_id: user.id,
+      entity_type: 'workspace',
+      entity_id: data.id,
+      event_type: 'workspace_created',
+      title: `Workspace created: ${data.name}`,
+      description: `Created workspace ${data.name}`,
+      metadata: {
+        workspace_id: data.id,
+        workspace_name: data.name,
+        action: 'created workspace',
+      },
     });
 
     return data as Workspace;
@@ -98,6 +124,7 @@ export const workspaceService = {
         workspace_id: input.workspace_id,
         user_id: input.user_id,
         role: input.role,
+        status: 'active',
       })
       .select()
       .single();
@@ -126,6 +153,26 @@ export const workspaceService = {
       .single();
 
     if (error) throw error;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      recordActivity({
+        workspace_id: workspaceId,
+        actor_id: user.id,
+        entity_type: 'workspace',
+        entity_id: workspaceId,
+        event_type: 'member_role_updated',
+        title: 'Workspace member role updated',
+        description: `Updated workspace member role`,
+        metadata: {
+          user_id: userId,
+          user_name: user.email || 'Unknown user',
+          action: 'updated workspace member role',
+          role: input.role,
+        },
+      });
+    }
+
     return data as WorkspaceMember;
   },
 
@@ -135,6 +182,7 @@ export const workspaceService = {
       .select(`
         id,
         role,
+        status,
         joined_at,
         user_id,
         profiles (

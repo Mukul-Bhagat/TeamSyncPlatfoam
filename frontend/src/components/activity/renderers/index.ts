@@ -5,3 +5,4 @@ export { MessageActivityRenderer } from './MessageActivityRenderer';
 export { WorkspaceActivityRenderer } from './WorkspaceActivityRenderer';
 export { ChannelActivityRenderer } from './ChannelActivityRenderer';
 export { UserActivityRenderer } from './UserActivityRenderer';
+export { ProjectActivityRenderer } from './ProjectActivityRenderer';

@@ -26,7 +26,7 @@ export function ActivityFeed({ workspaceId, organizationId, limit = 50 }: Activi
   function groupByDate(activitiesList: typeof activities) {
     const groups: Record<string, typeof activitiesList> = {};
     
-    activitiesList?.forEach((activity) => {
+    (activitiesList || []).forEach((activity) => {
       const date = new Date(activity.created_at).toDateString();
       if (!groups[date]) {
         groups[date] = [];
@@ -122,7 +122,7 @@ export function ActivityFeed({ workspaceId, organizationId, limit = 50 }: Activi
 
                 {/* Activities */}
                 <div className="space-y-2">
-                  {group.activities.map((activity) => (
+                  {(group.activities || []).map((activity) => (
                     <ActivityRenderer key={activity.id} activity={activity} />
                   ))}
                 </div>

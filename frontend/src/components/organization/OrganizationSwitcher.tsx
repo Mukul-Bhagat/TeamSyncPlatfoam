@@ -18,8 +18,14 @@ export function OrganizationSwitcher({
   const { data: organizations, isLoading } = useOrganizations();
 
   const currentOrg = organizations?.find(
-    (org) => org.organizations[0]?.id === currentOrganizationId
-  );
+    (org) => org.organization_id === currentOrganizationId
+  ) || organizations?.[0];
+
+  const currentOrganizationLabel =
+    currentOrg?.organizations?.name || 'Select Organization';
+
+  const currentOrganizationValue =
+    currentOrg?.organization_id || currentOrganizationId || undefined;
 
   if (isLoading) {
     return (
@@ -43,7 +49,7 @@ export function OrganizationSwitcher({
             <Building2 className="w-4 h-4 text-primary" />
           </div>
           <span className="text-sm font-medium text-foreground truncate">
-            {currentOrg?.organizations[0]?.name || 'Select Organization'}
+            {currentOrganizationLabel}
           </span>
         </div>
         <ChevronDown
@@ -73,14 +79,14 @@ export function OrganizationSwitcher({
                 <button
                   key={org.organization_id}
                   onClick={() => {
-                    onOrganizationChange?.(org.organizations[0]?.id);
+                    onOrganizationChange?.(org.organization_id);
                     setIsOpen(false);
                   }}
                   className={cn(
                     'w-full flex items-center gap-2 px-3 py-2 rounded-lg',
                     'text-left transition-all duration-fast',
                     'hover:bg-primary/10',
-                    currentOrganizationId === org.organizations[0]?.id
+                    currentOrganizationValue === org.organization_id
                       ? 'bg-primary/20 text-primary'
                       : 'text-foreground'
                   )}
@@ -89,7 +95,7 @@ export function OrganizationSwitcher({
                     <Building2 className="w-4 h-4" />
                   </div>
                   <span className="text-sm font-medium truncate">
-                    {org.organizations[0]?.name}
+                    {org.organizations?.name}
                   </span>
                 </button>
               ))}

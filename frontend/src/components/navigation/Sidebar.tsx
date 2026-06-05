@@ -8,6 +8,10 @@ import { OrganizationSwitcher } from '@/components/organization/OrganizationSwit
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher';
 import { ChannelSidebar } from '@/components/channels/ChannelSidebar';
 import { CreateChannelModal } from '@/components/channels/CreateChannelModal';
+import { ProjectSidebar } from '@/components/projects/ProjectSidebar';
+import { useAuth } from '@/hooks/useAuth';
+import { useUnreadCount } from '@/features/notifications/hooks/useNotifications';
+import { useWorkspaceContextStore } from '@/store/workspace-context.store';
 
 interface SidebarProps {
   children?: ReactNode;
@@ -41,9 +45,28 @@ export function Sidebar({
     setLeftSidebarMobileOpen,
   } = usePanelStore();
   const [isCreateChannelModalOpen, setIsCreateChannelModalOpen] = useState(false);
+  const {
+    organizationId: selectedOrganizationId,
+    workspaceId: selectedWorkspaceId,
+    projectId: selectedProjectId,
+    setOrganizationId,
+    setWorkspaceId,
+  } = useWorkspaceContextStore();
+  
+  // Get current user for notifications
+  const { user } = useAuth();
+  const { data: unreadCount } = useUnreadCount(user?.id || '');
+
+  const resolvedOrganizationId = currentOrganizationId || selectedOrganizationId || undefined;
+  const resolvedWorkspaceId = currentWorkspaceId || selectedWorkspaceId || undefined;
 
   const navigation = [
-    { icon: Layers, label: 'Workspace', href: '/workspace', badge: 3 },
+    {
+      icon: Layers,
+      label: 'Workspace',
+      href: '/workspace',
+      badge: typeof unreadCount === 'number' && unreadCount > 0 ? unreadCount : undefined,
+    },
     { icon: MessageSquare, label: 'Channels', href: '/channels' },
     { icon: Users, label: 'Team', href: '/team' },
     { icon: Calendar, label: 'Activity', href: '/activity' },
@@ -125,28 +148,44 @@ export function Sidebar({
               {/* Organization & Workspace Switchers */}
               <div className="mb-4 space-y-2">
                 <OrganizationSwitcher
-                  currentOrganizationId={currentOrganizationId}
-                  onOrganizationChange={onOrganizationChange}
+                  currentOrganizationId={resolvedOrganizationId}
+                  onOrganizationChange={(organizationId) => {
+                    setOrganizationId(organizationId);
+                    onOrganizationChange?.(organizationId);
+                  }}
                   onCreateOrganization={onCreateOrganization}
                 />
-                {currentOrganizationId && (
+                {resolvedOrganizationId && (
                   <WorkspaceSwitcher
-                    organizationId={currentOrganizationId}
-                    currentWorkspaceId={currentWorkspaceId}
-                    onWorkspaceChange={onWorkspaceChange}
+                    organizationId={resolvedOrganizationId}
+                    currentWorkspaceId={resolvedWorkspaceId}
+                    onWorkspaceChange={(workspaceId) => {
+                      setWorkspaceId(workspaceId);
+                      onWorkspaceChange?.(workspaceId);
+                    }}
                     onCreateWorkspace={onCreateWorkspace}
                   />
                 )}
               </div>
 
               {/* Channel Sidebar */}
-              {currentWorkspaceId && (
+              {resolvedWorkspaceId && (
                 <div className="mb-4">
                   <ChannelSidebar
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={resolvedWorkspaceId}
                     currentChannelId={currentChannelId}
                     onChannelSelect={onChannelSelect}
                     onCreateChannel={() => setIsCreateChannelModalOpen(true)}
+                  />
+                </div>
+              )}
+
+              {/* Project Sidebar */}
+              {resolvedWorkspaceId && (
+                <div className="mb-4">
+                  <ProjectSidebar
+                    workspaceId={resolvedWorkspaceId}
+                    currentProjectId={selectedProjectId || undefined}
                   />
                 </div>
               )}

@@ -1,4 +1,11 @@
-export type OrganizationRole = 'owner' | 'admin' | 'member';
+export type OrganizationRole =
+  | 'owner'
+  | 'admin'
+  | 'manager'
+  | 'lead'
+  | 'developer'
+  | 'viewer'
+  | 'guest';
 
 export interface Organization {
   id: string;
@@ -15,6 +22,7 @@ export interface OrganizationMember {
   organization_id: string;
   user_id: string;
   role: OrganizationRole;
+  status: 'active' | 'suspended';
   joined_at: string;
   // Joined relations
   user?: {
@@ -29,13 +37,15 @@ export interface OrganizationMember {
 export interface OrganizationMemberWithOrg {
   organization_id: string;
   role: OrganizationRole;
-  organizations: Organization[];
+  status: 'active' | 'suspended';
+  organizations: Organization;
 }
 
 // Type for Supabase nested query response - listOrganizationMembers
 export interface OrganizationMemberWithProfile {
   id: string;
   role: OrganizationRole;
+  status: 'active' | 'suspended';
   joined_at: string;
   user_id: string;
   profiles: {
@@ -43,7 +53,7 @@ export interface OrganizationMemberWithProfile {
     full_name?: string;
     username?: string;
     avatar_url?: string;
-  }[];
+  };
 }
 
 export interface CreateOrganizationInput {

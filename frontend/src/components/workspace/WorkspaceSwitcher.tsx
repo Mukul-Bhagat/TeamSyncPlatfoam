@@ -19,7 +19,8 @@ export function WorkspaceSwitcher({
   const [isOpen, setIsOpen] = useState(false);
   const { data: workspaces, isLoading } = useWorkspaces(organizationId);
 
-  const currentWorkspace = workspaces?.find((ws) => ws.id === currentWorkspaceId);
+  const currentWorkspace = workspaces?.find((ws) => ws.id === currentWorkspaceId) || workspaces?.[0];
+  const currentWorkspaceValue = currentWorkspace?.id || currentWorkspaceId || undefined;
 
   if (isLoading) {
     return (
@@ -84,7 +85,7 @@ export function WorkspaceSwitcher({
                     'w-full flex items-center gap-2 px-3 py-2 rounded-lg',
                     'text-left transition-all duration-fast',
                     'hover:bg-accent/10',
-                    currentWorkspaceId === workspace.id
+                    currentWorkspaceValue === workspace.id
                       ? 'bg-accent/20 text-accent'
                       : 'text-foreground'
                   )}

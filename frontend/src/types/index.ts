@@ -12,8 +12,13 @@ export interface Project {
   name: string;
   description?: string;
   owner_id: string;
+  workspace_id?: string;
   team_id?: string;
-  status: 'active' | 'archived' | 'completed';
+  visibility?: 'private' | 'internal' | 'public';
+  icon?: string;
+  color?: string;
+  created_by?: string;
+  status: 'planning' | 'active' | 'on_hold' | 'completed' | 'archived';
   created_at: string;
   updated_at: string;
 }
@@ -62,6 +67,8 @@ export interface PaginationParams {
   limit: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  workspaceId?: string;
+  organizationId?: string;
 }
 
 export interface PaginatedResponse<T> {
