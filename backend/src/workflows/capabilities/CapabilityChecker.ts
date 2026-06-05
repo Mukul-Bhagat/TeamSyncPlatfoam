@@ -80,7 +80,7 @@ export class CapabilityChecker {
   async getUserCapabilities(userId: string): Promise<string[]> {
     const { data, error } = await this.supabase
       .from('user_capabilities')
-      .select('capability_name')
+      .select('capability_name, expires_at')
       .eq('user_id', userId);
 
     if (error) {

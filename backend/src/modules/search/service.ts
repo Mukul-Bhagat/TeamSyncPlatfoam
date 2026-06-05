@@ -15,7 +15,7 @@ export class SearchService {
    * Perform hybrid search
    */
   async search(request: SearchRequest): Promise<SearchResponse> {
-    const results = await this.searchEngine.search({
+    const engineResults = await this.searchEngine.search({
       query: request.query,
       organizationId: request.organization_id,
       workspaceId: request.workspace_id,
@@ -23,6 +23,17 @@ export class SearchService {
       limit: request.limit || 10,
       useSemantic: request.use_semantic !== false,
     });
+
+    const results = engineResults.map((r) => ({
+      id: r.id,
+      entity_type: r.entityType as any,
+      entity_id: r.entityId,
+      title: r.title,
+      content: r.content,
+      score: r.score,
+      metadata: r.metadata,
+      created_at: r.createdAt,
+    }));
 
     return {
       results,
@@ -35,7 +46,7 @@ export class SearchService {
    * Semantic-only search
    */
   async semanticSearch(request: SearchRequest): Promise<SearchResponse> {
-    const results = await this.searchEngine.search({
+    const engineResults = await this.searchEngine.search({
       query: request.query,
       organizationId: request.organization_id,
       workspaceId: request.workspace_id,
@@ -43,6 +54,17 @@ export class SearchService {
       limit: request.limit || 10,
       useSemantic: true,
     });
+
+    const results = engineResults.map((r) => ({
+      id: r.id,
+      entity_type: r.entityType as any,
+      entity_id: r.entityId,
+      title: r.title,
+      content: r.content,
+      score: r.score,
+      metadata: r.metadata,
+      created_at: r.createdAt,
+    }));
 
     return {
       results,

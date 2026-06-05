@@ -75,7 +75,7 @@ export async function aiRoutes(fastify: FastifyInstance) {
   /**
    * Health check for AI module
    */
-  fastify.get('/ai/health', async (request, reply) => {
+  fastify.get('/ai/health', async (_request, reply) => {
     return reply.send({ status: 'ok', timestamp: new Date().toISOString() });
   });
 }

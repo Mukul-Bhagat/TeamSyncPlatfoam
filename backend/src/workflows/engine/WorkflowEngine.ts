@@ -79,7 +79,7 @@ export class WorkflowEngine {
     this.validator = new WorkflowValidator();
     this.stateTracker = new WorkflowStateTracker();
     this.logger = new WorkflowLogger();
-    this.triggerEngine = new TriggerEngine();
+    this.triggerEngine = TriggerEngine.getInstance();
     this.actionExecutor = new ActionExecutor();
   }
 
@@ -189,7 +189,7 @@ export class WorkflowEngine {
     for (const step of definition.steps) {
       try {
         // Check conditions
-        if (step.conditions && !this.evaluateConditions(step.conditions, execution.execution_context)) {
+        if (step.conditions && !this.evaluateConditions([step.conditions], execution.execution_context)) {
           this.logger.logStepSkipped(execution.id, step.id, 'Conditions not met');
           continue;
         }
@@ -248,7 +248,7 @@ export class WorkflowEngine {
   }
 
   private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private evaluateCondition(value: unknown, operator: string, expected: unknown): boolean {

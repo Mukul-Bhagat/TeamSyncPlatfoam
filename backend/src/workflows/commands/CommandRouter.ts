@@ -1,7 +1,7 @@
 import { CommandRegistry } from './CommandRegistry';
 import { CapabilityChecker } from '../capabilities/CapabilityChecker';
 import { WorkflowLogger } from '../engine/WorkflowLogger';
-import type { ICommand, CommandContext, CommandResult } from './ICommand';
+import type { CommandContext, CommandResult } from './ICommand';
 
 export class CommandRouter {
   private static instance: CommandRouter;

@@ -9,13 +9,19 @@ export class TriggerEngine {
   private eventBus: InternalEventBus;
   private triggerRegistry: TriggerRegistry;
   private logger: WorkflowLogger;
-  private workflowEngine: WorkflowEngine;
+  private _workflowEngine: WorkflowEngine | null = null;
 
   private constructor() {
     this.eventBus = InternalEventBus.getInstance();
     this.triggerRegistry = TriggerRegistry.getInstance();
     this.logger = new WorkflowLogger();
-    this.workflowEngine = WorkflowEngine.getInstance();
+  }
+
+  private get workflowEngine(): WorkflowEngine {
+    if (!this._workflowEngine) {
+      this._workflowEngine = WorkflowEngine.getInstance();
+    }
+    return this._workflowEngine;
   }
 
   static getInstance(): TriggerEngine {

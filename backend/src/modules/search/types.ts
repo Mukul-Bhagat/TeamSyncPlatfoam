@@ -1,4 +1,4 @@
-export type EntityType = 'message' | 'summary' | 'incident' | 'deployment' | 'activity' | 'workspace' | 'channel';
+export type EntityType = 'message' | 'summary' | 'incident' | 'deployment' | 'activity' | 'workspace' | 'channel' | 'project';
 export type MemoryType = 'important_incident' | 'deployment_pattern' | 'operational_decision' | 'recurring_issue' | 'ai_generated_memory';
 
 export interface SearchRequest {

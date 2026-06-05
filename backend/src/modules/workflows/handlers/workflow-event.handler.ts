@@ -1,4 +1,4 @@
-import { InternalEventBus } from '../../core/event-bus/InternalEventBus';
+import { InternalEventBus } from '../../../core/event-bus/InternalEventBus';
 import type { EcosystemEvent } from '../../../types';
 
 const eventBus = InternalEventBus.getInstance();

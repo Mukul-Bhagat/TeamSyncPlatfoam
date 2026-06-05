@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import { env } from '../../config/env';
-import { WorkflowEngine } from '../../workflows/engine/WorkflowEngine';
 import { TriggerEngine } from '../../workflows/triggers/TriggerEngine';
 import { ExecutionManager } from '../../workflows/executions/ExecutionManager';
 import { CapabilityManager } from '../../workflows/capabilities/CapabilityManager';
@@ -10,14 +9,12 @@ import type { Workflow, WorkflowExecution } from './types';
 const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
 export class WorkflowService {
-  private workflowEngine: WorkflowEngine;
   private triggerEngine: TriggerEngine;
   private executionManager: ExecutionManager;
   private capabilityManager: CapabilityManager;
   private commandRouter: CommandRouter;
 
   constructor() {
-    this.workflowEngine = WorkflowEngine.getInstance();
     this.triggerEngine = TriggerEngine.getInstance();
     this.executionManager = ExecutionManager.getInstance();
     this.capabilityManager = CapabilityManager.getInstance();

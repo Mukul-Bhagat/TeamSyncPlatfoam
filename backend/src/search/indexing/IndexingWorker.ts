@@ -1,6 +1,5 @@
 import { IndexingQueue, type IndexingJob } from './IndexingQueue';
 import { EmbeddingProviderFactory } from '../embeddings/EmbeddingProviderFactory';
-import { VectorProviderFactory } from '../vectors/VectorProviderFactory';
 import { supabase } from '../../shared/database';
 import { env } from '../../config/env';
 
@@ -12,7 +11,6 @@ export class IndexingWorker {
     'openai',
     { apiKey: env.OPENAI_API_KEY || '' }
   );
-  private vectorProvider = VectorProviderFactory.create('pgvector', 1536);
 
   constructor(queue: IndexingQueue) {
     this.queue = queue;

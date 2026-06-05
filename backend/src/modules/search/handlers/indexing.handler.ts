@@ -14,7 +14,6 @@ export function registerIndexingHandler() {
       const messageId = payload.message_id as string;
       const organizationId = event.organization_id;
       const workspaceId = event.workspace_id;
-      const channelId = payload.channel_id as string;
 
       if (messageId && organizationId) {
         indexingPipeline.queueIndexing({

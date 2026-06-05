@@ -1,5 +1,4 @@
-import { AIOrchestrator, type GenerateInsightOptions } from '../orchestrator/AIOrchestrator';
-import { RuleBasedInsightGenerator } from './RuleBasedInsightGenerator';
+import { AIOrchestrator } from '../orchestrator/AIOrchestrator';
 import type { ContextData } from '../context/ContextEngine';
 
 export interface InsightRule {
@@ -11,12 +10,10 @@ export interface InsightRule {
 
 export class InsightEngine {
   private orchestrator: AIOrchestrator;
-  private ruleGenerator: RuleBasedInsightGenerator;
   private rules: InsightRule[] = [];
 
   constructor(orchestrator: AIOrchestrator) {
     this.orchestrator = orchestrator;
-    this.ruleGenerator = new RuleBasedInsightGenerator();
     this.initializeRules();
   }
 
@@ -65,7 +62,6 @@ export class InsightEngine {
       severity: 'warning',
       metadata: {
         pattern_description: 'Multiple deployment failures detected',
-        affected_entities: context.deployments?.map((d) => d.service).join(', ') || '',
       },
     });
 
@@ -99,7 +95,6 @@ export class InsightEngine {
       severity: 'info',
       metadata: {
         pattern_description: 'Unusual message activity detected',
-        affected_entities: `${messages.length} messages`,
       },
     });
 

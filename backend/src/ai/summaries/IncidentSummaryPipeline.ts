@@ -1,5 +1,5 @@
 import { SummaryPipeline } from './SummaryPipeline';
-import { AIOrchestrator, type GenerateSummaryOptions } from '../orchestrator/AIOrchestrator';
+import type { GenerateSummaryOptions } from '../orchestrator/AIOrchestrator';
 
 export class IncidentSummaryPipeline extends SummaryPipeline {
   async execute(options: GenerateSummaryOptions): Promise<{ id: string; content: string; title: string }> {

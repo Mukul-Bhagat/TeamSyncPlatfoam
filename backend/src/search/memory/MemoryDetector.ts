@@ -14,7 +14,7 @@ export class MemoryDetector {
   /**
    * Detect deployment patterns (repeated failures)
    */
-  async detectDeploymentPattern(deploymentId: string, organizationId: string): Promise<MemoryCandidate | null> {
+  async detectDeploymentPattern(deploymentId: string, _organizationId: string): Promise<MemoryCandidate | null> {
     // Fetch recent deployments for the same service
     const { data: deployment } = await supabase
       .from('deployments')
@@ -58,7 +58,7 @@ export class MemoryDetector {
   /**
    * Detect important incidents (critical severity)
    */
-  async detectImportantIncident(incidentId: string, organizationId: string): Promise<MemoryCandidate | null> {
+  async detectImportantIncident(incidentId: string, _organizationId: string): Promise<MemoryCandidate | null> {
     const { data: incident } = await supabase
       .from('incidents')
       .select('*')
@@ -87,7 +87,7 @@ export class MemoryDetector {
   /**
    * Detect recurring issues (same incident pattern)
    */
-  async detectRecurringIssue(incidentId: string, organizationId: string): Promise<MemoryCandidate | null> {
+  async detectRecurringIssue(incidentId: string, _organizationId: string): Promise<MemoryCandidate | null> {
     const { data: incident } = await supabase
       .from('incidents')
       .select('*')
@@ -129,7 +129,7 @@ export class MemoryDetector {
   /**
    * Create memory from high-severity AI insight
    */
-  async detectAIMemory(insightId: string, organizationId: string): Promise<MemoryCandidate | null> {
+  async detectAIMemory(insightId: string, _organizationId: string): Promise<MemoryCandidate | null> {
     const { data: insight } = await supabase
       .from('ai_insights')
       .select('*')

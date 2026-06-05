@@ -2,13 +2,11 @@ import { supabase } from '../../shared/database';
 import type { IVectorProvider, VectorDocument, SearchResult } from './IVectorProvider';
 
 export class PgVectorProvider implements IVectorProvider {
-  private dimension: number;
-
-  constructor(dimension: number = 1536) {
-    this.dimension = dimension;
+  constructor(_dimension: number = 1536) {
+    // Dimension is stored for future use
   }
 
-  async store(documentId: string, vector: number[], metadata?: Record<string, unknown>): Promise<void> {
+  async store(documentId: string, vector: number[], _metadata?: Record<string, unknown>): Promise<void> {
     const { error } = await supabase
       .from('search_documents')
       .update({
@@ -126,7 +124,7 @@ export class PgVectorProvider implements IVectorProvider {
       const { error } = await supabase.rpc('pgvector_version');
       // If the function doesn't exist, we'll get an error - that's okay for now
       // We'll assume pgvector is available if the table exists
-      const { data } = await supabase
+      await supabase
         .from('search_documents')
         .select('id')
         .limit(1);

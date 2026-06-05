@@ -309,7 +309,7 @@ export class AIOrchestrator {
   /**
    * Build prompt variables for insights
    */
-  private buildInsightPromptVariables(insightType: string, context: ContextData, metadata?: Record<string, unknown>): Record<string, string> {
+  private buildInsightPromptVariables(insightType: string, _context: ContextData, metadata?: Record<string, unknown>): Record<string, string> {
     return {
       anomaly_type: insightType,
       time_range: (metadata?.timeRange as string) || 'last 24 hours',
@@ -321,7 +321,7 @@ export class AIOrchestrator {
   /**
    * Build context for insight generation
    */
-  private async buildInsightContext(insightType: string, organizationId: string, workspaceId?: string): Promise<ContextData> {
+  private async buildInsightContext(_insightType: string, organizationId: string, workspaceId?: string): Promise<ContextData> {
     const timeRange = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
     if (workspaceId) {
@@ -352,7 +352,7 @@ export class AIOrchestrator {
   /**
    * Generate title for insight
    */
-  private generateInsightTitle(insightType: string, context: ContextData): string {
+  private generateInsightTitle(insightType: string, _context: ContextData): string {
     switch (insightType) {
       case 'anomaly_detected':
         return 'Anomaly Detected';
