@@ -1,14 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InsightEngine = void 0;
-const RuleBasedInsightGenerator_1 = require("./RuleBasedInsightGenerator");
 class InsightEngine {
     orchestrator;
-    ruleGenerator;
     rules = [];
     constructor(orchestrator) {
         this.orchestrator = orchestrator;
-        this.ruleGenerator = new RuleBasedInsightGenerator_1.RuleBasedInsightGenerator();
         this.initializeRules();
     }
     /**
@@ -49,7 +46,6 @@ class InsightEngine {
             severity: 'warning',
             metadata: {
                 pattern_description: 'Multiple deployment failures detected',
-                affected_entities: context.deployments?.map((d) => d.service).join(', ') || '',
             },
         });
         // Rule: Repeated incidents on same service
@@ -81,7 +77,6 @@ class InsightEngine {
             severity: 'info',
             metadata: {
                 pattern_description: 'Unusual message activity detected',
-                affected_entities: `${messages.length} messages`,
             },
         });
         // Rule: Critical incident without resolution

@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IndexingWorker = void 0;
 const EmbeddingProviderFactory_1 = require("../embeddings/EmbeddingProviderFactory");
-const VectorProviderFactory_1 = require("../vectors/VectorProviderFactory");
 const database_1 = require("../../shared/database");
 const env_1 = require("../../config/env");
 class IndexingWorker {
@@ -10,7 +9,6 @@ class IndexingWorker {
     isRunning = false;
     processingInterval = null;
     embeddingProvider = EmbeddingProviderFactory_1.EmbeddingProviderFactory.create('openai', { apiKey: env_1.env.OPENAI_API_KEY || '' });
-    vectorProvider = VectorProviderFactory_1.VectorProviderFactory.create('pgvector', 1536);
     constructor(queue) {
         this.queue = queue;
     }

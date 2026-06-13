@@ -1,6 +1,5 @@
 import type { Workflow, WorkflowExecution } from './types';
 export declare class WorkflowService {
-    private workflowEngine;
     private triggerEngine;
     private executionManager;
     private capabilityManager;

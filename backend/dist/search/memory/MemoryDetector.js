@@ -6,7 +6,7 @@ class MemoryDetector {
     /**
      * Detect deployment patterns (repeated failures)
      */
-    async detectDeploymentPattern(deploymentId, organizationId) {
+    async detectDeploymentPattern(deploymentId, _organizationId) {
         // Fetch recent deployments for the same service
         const { data: deployment } = await database_1.supabase
             .from('deployments')
@@ -45,7 +45,7 @@ class MemoryDetector {
     /**
      * Detect important incidents (critical severity)
      */
-    async detectImportantIncident(incidentId, organizationId) {
+    async detectImportantIncident(incidentId, _organizationId) {
         const { data: incident } = await database_1.supabase
             .from('incidents')
             .select('*')
@@ -71,7 +71,7 @@ class MemoryDetector {
     /**
      * Detect recurring issues (same incident pattern)
      */
-    async detectRecurringIssue(incidentId, organizationId) {
+    async detectRecurringIssue(incidentId, _organizationId) {
         const { data: incident } = await database_1.supabase
             .from('incidents')
             .select('*')
@@ -108,7 +108,7 @@ class MemoryDetector {
     /**
      * Create memory from high-severity AI insight
      */
-    async detectAIMemory(insightId, organizationId) {
+    async detectAIMemory(insightId, _organizationId) {
         const { data: insight } = await database_1.supabase
             .from('ai_insights')
             .select('*')

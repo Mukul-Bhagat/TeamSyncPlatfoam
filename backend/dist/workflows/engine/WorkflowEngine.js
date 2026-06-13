@@ -25,7 +25,7 @@ class WorkflowEngine {
         this.validator = new WorkflowValidator_1.WorkflowValidator();
         this.stateTracker = new WorkflowStateTracker_1.WorkflowStateTracker();
         this.logger = new WorkflowLogger_1.WorkflowLogger();
-        this.triggerEngine = new TriggerEngine_1.TriggerEngine();
+        this.triggerEngine = TriggerEngine_1.TriggerEngine.getInstance();
         this.actionExecutor = new ActionExecutor_1.ActionExecutor();
     }
     static getInstance() {
@@ -114,7 +114,7 @@ class WorkflowEngine {
         for (const step of definition.steps) {
             try {
                 // Check conditions
-                if (step.conditions && !this.evaluateConditions(step.conditions, execution.execution_context)) {
+                if (step.conditions && !this.evaluateConditions([step.conditions], execution.execution_context)) {
                     this.logger.logStepSkipped(execution.id, step.id, 'Conditions not met');
                     continue;
                 }

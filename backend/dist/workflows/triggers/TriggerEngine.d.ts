@@ -4,8 +4,9 @@ export declare class TriggerEngine {
     private eventBus;
     private triggerRegistry;
     private logger;
-    private workflowEngine;
+    private _workflowEngine;
     private constructor();
+    private get workflowEngine();
     static getInstance(): TriggerEngine;
     /**
      * Register a trigger for a workflow

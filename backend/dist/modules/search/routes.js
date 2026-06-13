@@ -68,7 +68,7 @@ async function searchRoutes(fastify) {
     /**
      * Health check for search module
      */
-    fastify.get('/search/health', async (request, reply) => {
+    fastify.get('/search/health', async (_request, reply) => {
         return reply.send({ status: 'ok', timestamp: new Date().toISOString() });
     });
 }

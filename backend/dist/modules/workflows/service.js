@@ -3,20 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WorkflowService = void 0;
 const supabase_js_1 = require("@supabase/supabase-js");
 const env_1 = require("../../config/env");
-const WorkflowEngine_1 = require("../../workflows/engine/WorkflowEngine");
 const TriggerEngine_1 = require("../../workflows/triggers/TriggerEngine");
 const ExecutionManager_1 = require("../../workflows/executions/ExecutionManager");
 const CapabilityManager_1 = require("../../workflows/capabilities/CapabilityManager");
 const CommandRouter_1 = require("../../workflows/commands/CommandRouter");
 const supabase = (0, supabase_js_1.createClient)(env_1.env.SUPABASE_URL, env_1.env.SUPABASE_SERVICE_ROLE_KEY);
 class WorkflowService {
-    workflowEngine;
     triggerEngine;
     executionManager;
     capabilityManager;
     commandRouter;
     constructor() {
-        this.workflowEngine = WorkflowEngine_1.WorkflowEngine.getInstance();
         this.triggerEngine = TriggerEngine_1.TriggerEngine.getInstance();
         this.executionManager = ExecutionManager_1.ExecutionManager.getInstance();
         this.capabilityManager = CapabilityManager_1.CapabilityManager.getInstance();

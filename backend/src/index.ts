@@ -15,6 +15,7 @@ import { realtimeRoutes } from './modules/realtime/routes';
 import { aiRoutes } from './modules/ai/routes';
 import { searchRoutes } from './modules/search/routes';
 import { workflowRoutes } from './modules/workflows/routes';
+import { collaborationRoutes } from './modules/collaboration/routes';
 import { registerActivityFeedHandler } from './modules/events/handlers/activity-feed.handler';
 import { registerRealtimeBroadcastHandler } from './modules/events/handlers/realtime-broadcast.handler';
 import { registerNotificationHandler } from './modules/events/handlers/notification.handler';
@@ -98,6 +99,7 @@ async function registerRoutes() {
   await fastify.register(aiRoutes, { prefix: '/api' });
   await fastify.register(searchRoutes, { prefix: '/api' });
   await fastify.register(workflowRoutes, { prefix: '/api' });
+  await fastify.register(collaborationRoutes, { prefix: '/api' });
 
   // Health check endpoint
   fastify.get('/health', async () => {

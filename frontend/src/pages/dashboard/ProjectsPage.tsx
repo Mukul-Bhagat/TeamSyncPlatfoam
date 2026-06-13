@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FolderKanban, Plus, Layers, Filter } from 'lucide-react';
+import { FolderKanban, Plus, Layers, Filter, Shield } from 'lucide-react';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { CreateProjectModal } from '@/components/projects/CreateProjectModal';
 import { useProjects } from '@/hooks/useProjects';
-import { useWorkspaceContextStore } from '@/store/workspace-context.store';
 import { cn } from '@/lib/utils';
 
 export function ProjectsPage() {
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const navigate = useNavigate();
-  const { workspaceId, organizationId } = useWorkspaceContextStore();
-  const { data: projectsData, isLoading } = useProjects({ workspaceId: workspaceId || undefined, organizationId: organizationId || undefined, limit: 50 });
+  const {
+    data: projectsData,
+    isLoading,
+    error,
+    refetch,
+  } = useProjects({ limit: 50, useContextDefaults: false });
 
   const projects = projectsData?.data || [];
 
@@ -56,16 +59,16 @@ export function ProjectsPage() {
               <p className="text-sm text-muted-foreground">Selected Workspace</p>
               <Filter className="h-4 w-4 text-primary" />
             </div>
-            <p className="mt-3 truncate text-lg font-semibold text-foreground">
-              {workspaceId || 'All workspaces'}
+            <p className="mt-3 text-lg font-semibold text-foreground">
+              All accessible
             </p>
           </div>
           <div className="rounded-2xl border border-glass-border bg-card/70 p-5 shadow-soft-md">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Visibility Scope</p>
-              <FolderKanban className="h-4 w-4 text-primary" />
+              <p className="text-sm text-muted-foreground">Access model</p>
+              <Shield className="h-4 w-4 text-primary" />
             </div>
-            <p className="mt-3 text-lg font-semibold text-foreground">Real-time</p>
+            <p className="mt-3 text-lg font-semibold text-foreground">Invite-only</p>
           </div>
           <div className="rounded-2xl border border-glass-border bg-card/70 p-5 shadow-soft-md">
             <div className="flex items-center justify-between">
@@ -99,6 +102,20 @@ export function ProjectsPage() {
                 {[1, 2, 3, 4, 5, 6].map((item) => (
                   <div key={item} className="h-28 animate-pulse rounded-xl border border-glass-border bg-background/40" />
                 ))}
+              </div>
+            ) : error ? (
+              <div className="rounded-xl border border-danger/30 bg-danger/5 px-6 py-10 text-center">
+                <p className="text-base font-medium text-foreground">Could not load projects</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {error instanceof Error ? error.message : 'Please try again in a moment.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void refetch()}
+                  className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  Retry
+                </button>
               </div>
             ) : projects.length === 0 ? (
               <div className="rounded-xl border border-dashed border-glass-border px-6 py-12 text-center">
@@ -139,7 +156,7 @@ export function ProjectsPage() {
                         <div>
                           <h3 className="text-sm font-semibold text-foreground">{project.name}</h3>
                           <p className="text-xs text-muted-foreground">
-                            {project.visibility || 'private'} · {project.status}
+                            Private · {project.status}
                           </p>
                         </div>
                       </div>
@@ -159,7 +176,6 @@ export function ProjectsPage() {
       </div>
 
       <CreateProjectModal
-        workspaceId={workspaceId || undefined}
         isOpen={isCreateProjectOpen}
         onClose={() => setIsCreateProjectOpen(false)}
         onCreated={(project) => navigate(`/projects/${project.id}`)}

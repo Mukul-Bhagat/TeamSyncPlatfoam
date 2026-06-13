@@ -10,12 +10,17 @@ class TriggerEngine {
     eventBus;
     triggerRegistry;
     logger;
-    workflowEngine;
+    _workflowEngine = null;
     constructor() {
         this.eventBus = InternalEventBus_1.InternalEventBus.getInstance();
         this.triggerRegistry = TriggerRegistry_1.TriggerRegistry.getInstance();
         this.logger = new WorkflowLogger_1.WorkflowLogger();
-        this.workflowEngine = WorkflowEngine_1.WorkflowEngine.getInstance();
+    }
+    get workflowEngine() {
+        if (!this._workflowEngine) {
+            this._workflowEngine = WorkflowEngine_1.WorkflowEngine.getInstance();
+        }
+        return this._workflowEngine;
     }
     static getInstance() {
         if (!TriggerEngine.instance) {

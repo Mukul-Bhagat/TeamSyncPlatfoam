@@ -8,7 +8,6 @@ export interface InsightRule {
 }
 export declare class InsightEngine {
     private orchestrator;
-    private ruleGenerator;
     private rules;
     constructor(orchestrator: AIOrchestrator);
     /**

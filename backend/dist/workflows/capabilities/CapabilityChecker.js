@@ -68,7 +68,7 @@ class CapabilityChecker {
     async getUserCapabilities(userId) {
         const { data, error } = await this.supabase
             .from('user_capabilities')
-            .select('capability_name')
+            .select('capability_name, expires_at')
             .eq('user_id', userId);
         if (error) {
             console.error(`Error getting user capabilities: ${error.message}`);

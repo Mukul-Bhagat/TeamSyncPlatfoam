@@ -13,7 +13,6 @@ function registerIndexingHandler() {
             const messageId = payload.message_id;
             const organizationId = event.organization_id;
             const workspaceId = event.workspace_id;
-            const channelId = payload.channel_id;
             if (messageId && organizationId) {
                 indexingPipeline.queueIndexing({
                     entityType: 'message',

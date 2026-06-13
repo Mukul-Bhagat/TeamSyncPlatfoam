@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { channelService } from './channel.service';
+import { api } from '@/lib/api';
 import { activityService } from './activity.service';
 import { auditService } from './audit.service';
 import type { Project, ApiResponse, PaginationParams, PaginatedResponse } from '@/types';
@@ -10,7 +10,6 @@ import type {
   ProjectMemberStatus,
   ProjectRole,
   ProjectStatus,
-  ProjectVisibility,
 } from '@/features/projects/types/project.types';
 
 export interface CreateProjectData {
@@ -18,7 +17,6 @@ export interface CreateProjectData {
   description?: string;
   team_id?: string;
   workspace_id?: string;
-  visibility?: ProjectVisibility;
   status?: ProjectStatus;
   icon?: string;
   color?: string;
@@ -29,7 +27,6 @@ export interface UpdateProjectData {
   name?: string;
   description?: string;
   status?: ProjectStatus;
-  visibility?: ProjectVisibility;
   icon?: string;
   color?: string;
 }
@@ -59,6 +56,10 @@ const recordAudit = (
   void auditService.createAuditLog(payload).catch(() => undefined);
 };
 
+function getErrorMessage(error: unknown, fallbackMessage: string) {
+  return error instanceof Error ? error.message : fallbackMessage;
+}
+
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 const createInvitationToken = () => {
@@ -80,32 +81,6 @@ const buildProjectSearchContent = (project: Project) => {
     .join(' ');
 };
 
-const projectChannelDefinitions = (project: Project) => [
-  {
-    name: `${project.name} Feed`,
-    slug: `project-${project.id}`,
-    description: `Project feed for ${project.name}`,
-    type: 'text' as const,
-    visibility: 'public' as const,
-    icon: '✨',
-  },
-  {
-    name: `${project.name} Chat`,
-    slug: `project-${project.id}-chat`,
-    description: `Project chat for ${project.name}`,
-    type: 'text' as const,
-    visibility: 'public' as const,
-    icon: '💬',
-  },
-  {
-    name: `${project.name} Announcements`,
-    slug: `project-${project.id}-announcements`,
-    description: `Project announcements for ${project.name}`,
-    type: 'announcement' as const,
-    visibility: 'public' as const,
-    icon: '📣',
-  },
-];
 
 async function resolveWorkspaceContext(workspaceId?: string) {
   if (!workspaceId) {
@@ -189,27 +164,6 @@ async function removeProjectSearchDocument(projectId: string) {
   if (error) throw error;
 }
 
-async function removeDefaultProjectChannels(project: Pick<Project, 'id' | 'workspace_id'>) {
-  if (!project.workspace_id) {
-    return;
-  }
-
-  const slugs = [
-    `project-${project.id}`,
-    `project-${project.id}-chat`,
-    `project-${project.id}-announcements`,
-  ];
-
-  const { error } = await supabase
-    .from('channels')
-    .delete()
-    .eq('workspace_id', project.workspace_id)
-    .in('slug', slugs);
-
-  if (error) {
-    throw error;
-  }
-}
 
 function toProjectMemberPayload(
   projectId: string,
@@ -245,86 +199,49 @@ async function fetchProjectContext(projectId: string) {
 }
 
 export const projectService = {
-  async getProjects(params?: PaginationParams): Promise<ApiResponse<PaginatedResponse<Project>>> {
+  async getProjects(
+    params?: PaginationParams & {
+      workspaceId?: string;
+      organizationId?: string;
+    }
+  ): Promise<ApiResponse<PaginatedResponse<Project>>> {
     try {
-      let query = supabase
-        .from('projects')
-        .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false });
-
-      if (params?.workspaceId) {
-        query = query.eq('workspace_id', params.workspaceId);
-      } else if (params?.organizationId) {
-        const { data: workspaces, error: workspaceError } = await supabase
-          .from('workspaces')
-          .select('id')
-          .eq('organization_id', params.organizationId);
-
-        if (workspaceError) throw workspaceError;
-
-        const workspaceIds = (workspaces || []).map((workspace) => workspace.id);
-        if (workspaceIds.length > 0) {
-          query = query.in('workspace_id', workspaceIds);
-        } else {
-          return {
-            data: {
-              data: [],
-              total: 0,
-              page: params?.page || 1,
-              limit: params?.limit || 10,
-              totalPages: 0,
-            },
-            error: null,
-          };
-        }
-      }
-
-      if (params?.page && params?.limit) {
-        const from = (params.page - 1) * params.limit;
-        const to = from + params.limit - 1;
-        query = query.range(from, to);
-      }
-
-      const { data, error, count } = await query;
-
-      if (error) throw error;
+      const response = await api.get<any>('/projects', {
+        workspace_id: params?.workspaceId || '',
+        organization_id: params?.organizationId || '',
+        page: params?.page?.toString() || '1',
+        limit: params?.limit?.toString() || '10',
+      });
 
       return {
         data: {
-          data: data || [],
-          total: count || 0,
-          page: params?.page || 1,
-          limit: params?.limit || 10,
-          totalPages: Math.ceil((count || 0) / (params?.limit || 10)),
+          data: response.data || [],
+          total: response.pagination?.total || 0,
+          page: response.pagination?.page || params?.page || 1,
+          limit: response.pagination?.limit || params?.limit || 10,
+          totalPages: response.pagination?.total_pages || 1,
         },
         error: null,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         data: null,
-        error: error.message || 'Failed to fetch projects',
+        error: getErrorMessage(error, 'Failed to fetch projects'),
       };
     }
   },
 
   async getProject(id: string): Promise<ApiResponse<Project>> {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-
+      const data = await api.get<Project>(`/projects/${id}`);
       return {
         data,
         error: null,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         data: null,
-        error: error.message || 'Failed to fetch project',
+        error: getErrorMessage(error, 'Failed to fetch project'),
       };
     }
   },
@@ -340,59 +257,14 @@ export const projectService = {
 
       const projectContext = await resolveWorkspaceContext(data.workspace_id);
 
-      const { data: project, error } = await supabase
-        .from('projects')
-        .insert({
-          name: data.name,
-          description: data.description,
-          team_id: data.team_id,
-          workspace_id: data.workspace_id,
-          owner_id: user.id,
-          created_by: user.id,
-          visibility: data.visibility || 'private',
-          status: data.status || 'planning',
-          icon: data.icon || null,
-          color: data.color || DEFAULT_PROJECT_COLOR,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      const projectRecord = project as Project;
-
-      const { error: ownerMemberError } = await supabase
-        .from('project_members')
-        .upsert(
-          {
-            project_id: projectRecord.id,
-            user_id: user.id,
-            email: normalizeEmail(user.email || ''),
-            role: 'owner',
-            status: 'active',
-            invited_by: user.id,
-            joined_at: new Date().toISOString(),
-          },
-          {
-            onConflict: 'project_id,email',
-          }
-        );
-
-      if (ownerMemberError) throw ownerMemberError;
-
-      await Promise.all(
-        projectChannelDefinitions(projectRecord).map((channel) =>
-          channelService.createChannel({
-            workspace_id: projectRecord.workspace_id as string,
-            name: channel.name,
-            slug: channel.slug,
-            description: channel.description,
-            type: channel.type,
-            visibility: channel.visibility,
-            icon: channel.icon,
-          })
-        )
-      );
+      const projectRecord = await api.post<Project>('/projects', {
+        workspace_id: data.workspace_id,
+        name: data.name,
+        description: data.description || null,
+        color: data.color || DEFAULT_PROJECT_COLOR,
+        icon: data.icon || null,
+        visibility: 'private',
+      });
 
       if (data.members && data.members.length > 0) {
         const sanitizedInvites = data.members.filter(
@@ -444,10 +316,10 @@ export const projectService = {
         error: null,
         message: 'Project created successfully',
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         data: null,
-        error: error.message || 'Failed to create project',
+        error: getErrorMessage(error, 'Failed to create project'),
       };
     }
   },
@@ -462,14 +334,10 @@ export const projectService = {
 
       if (fetchError) throw fetchError;
 
-      const { data: project, error } = await supabase
-        .from('projects')
-        .update(data)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
+      const project = await api.put<Project>(`/projects/${id}`, {
+        ...data,
+        visibility: 'private',
+      });
 
       const updatedProject = project as Project;
       const workspaceContext = updatedProject.workspace_id
@@ -525,10 +393,10 @@ export const projectService = {
         error: null,
         message: 'Project updated successfully',
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         data: null,
-        error: error.message || 'Failed to update project',
+        error: getErrorMessage(error, 'Failed to update project'),
       };
     }
   },
@@ -538,15 +406,9 @@ export const projectService = {
       const { data: { user } } = await supabase.auth.getUser();
       const { project, workspaceContext } = await fetchProjectContext(id);
 
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      await removeDefaultProjectChannels(project);
       await removeProjectSearchDocument(project.id);
+
+      await api.del(`/projects/${id}`);
 
       if (user) {
         await activityService
@@ -588,10 +450,10 @@ export const projectService = {
         error: null,
         message: 'Project deleted successfully',
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         data: null,
-        error: error.message || 'Failed to delete project',
+        error: getErrorMessage(error, 'Failed to delete project'),
       };
     }
   },

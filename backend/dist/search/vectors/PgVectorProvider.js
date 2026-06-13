@@ -3,11 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PgVectorProvider = void 0;
 const database_1 = require("../../shared/database");
 class PgVectorProvider {
-    dimension;
-    constructor(dimension = 1536) {
-        this.dimension = dimension;
+    constructor(_dimension = 1536) {
+        // Dimension is stored for future use
     }
-    async store(documentId, vector, metadata) {
+    async store(documentId, vector, _metadata) {
         const { error } = await database_1.supabase
             .from('search_documents')
             .update({
@@ -104,7 +103,7 @@ class PgVectorProvider {
             const { error } = await database_1.supabase.rpc('pgvector_version');
             // If the function doesn't exist, we'll get an error - that's okay for now
             // We'll assume pgvector is available if the table exists
-            const { data } = await database_1.supabase
+            await database_1.supabase
                 .from('search_documents')
                 .select('id')
                 .limit(1);

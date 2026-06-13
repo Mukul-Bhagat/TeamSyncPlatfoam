@@ -18,6 +18,7 @@ const routes_4 = require("./modules/realtime/routes");
 const routes_5 = require("./modules/ai/routes");
 const routes_6 = require("./modules/search/routes");
 const routes_7 = require("./modules/workflows/routes");
+const routes_8 = require("./modules/collaboration/routes");
 const activity_feed_handler_1 = require("./modules/events/handlers/activity-feed.handler");
 const realtime_broadcast_handler_1 = require("./modules/events/handlers/realtime-broadcast.handler");
 const notification_handler_1 = require("./modules/events/handlers/notification.handler");
@@ -94,6 +95,7 @@ async function registerRoutes() {
     await fastify.register(routes_5.aiRoutes, { prefix: '/api' });
     await fastify.register(routes_6.searchRoutes, { prefix: '/api' });
     await fastify.register(routes_7.workflowRoutes, { prefix: '/api' });
+    await fastify.register(routes_8.collaborationRoutes, { prefix: '/api' });
     // Health check endpoint
     fastify.get('/health', async () => {
         const eventBus = event_bus_1.InternalEventBus.getInstance();

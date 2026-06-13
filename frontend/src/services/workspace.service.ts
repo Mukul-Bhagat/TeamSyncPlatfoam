@@ -1,5 +1,5 @@
+import { api } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
-import { activityService } from './activity.service';
 import type {
   Workspace,
   WorkspaceMember,
@@ -10,140 +10,81 @@ import type {
   UpdateWorkspaceMemberRoleInput,
 } from '@/features/workspace/types/workspace.types';
 
-const recordActivity = (
-  payload: Parameters<typeof activityService.createActivity>[0]
-) => {
-  void activityService.createActivity(payload).catch(() => undefined);
-};
-
 export const workspaceService = {
-  async createWorkspace(input: CreateWorkspaceInput) {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('No authenticated user');
-
-    const { data, error } = await supabase
-      .from('workspaces')
-      .insert({
-        organization_id: input.organization_id,
-        name: input.name,
-        slug: input.slug,
-        description: input.description,
-        icon: input.icon,
-        created_by: user.id,
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    // Add creator as admin member
-    await this.addWorkspaceMember({
-      workspace_id: data.id,
-      user_id: data.created_by,
-      role: 'admin',
+  async createWorkspace(input: CreateWorkspaceInput): Promise<Workspace> {
+    return api.post<Workspace>('/workspaces', {
+      organization_id: input.organization_id,
+      name: input.name,
+      slug: input.slug,
+      description: input.description,
+      icon: input.icon,
     });
+  },
 
-    recordActivity({
-      organization_id: data.organization_id,
-      workspace_id: data.id,
-      actor_id: user.id,
-      entity_type: 'workspace',
-      entity_id: data.id,
-      event_type: 'workspace_created',
-      title: `Workspace created: ${data.name}`,
-      description: `Created workspace ${data.name}`,
-      metadata: {
-        workspace_id: data.id,
-        workspace_name: data.name,
-        action: 'created workspace',
-      },
+  async getWorkspace(id: string): Promise<Workspace> {
+    return api.get<Workspace>(`/workspaces/${id}`);
+  },
+
+  async getWorkspaceBySlug(organizationId: string, slug: string): Promise<Workspace> {
+    const list = await api.get<any[]>('/workspaces', { organization_id: organizationId });
+    const found = list.find((item) => item.workspace?.slug === slug);
+    if (!found) throw new Error('Workspace not found');
+    return found.workspace as Workspace;
+  },
+
+  async listUserWorkspaces(): Promise<Workspace[]> {
+    const list = await api.get<any[]>('/workspaces');
+    return list.map((item) => ({
+      ...item.workspace,
+      member_role: item.role,
+    })) as Workspace[];
+  },
+
+  async listOrganizationWorkspaces(organizationId: string): Promise<Workspace[]> {
+    const list = await api.get<any[]>('/workspaces', { organization_id: organizationId });
+    return list.map((item) => ({
+      ...item.workspace,
+      member_role: item.role,
+    })) as Workspace[];
+  },
+
+  async updateWorkspace(id: string, input: UpdateWorkspaceInput): Promise<Workspace> {
+    return api.put<Workspace>(`/workspaces/${id}`, input);
+  },
+
+  async deleteWorkspace(id: string): Promise<void> {
+    return api.del<void>(`/workspaces/${id}`);
+  },
+
+  async addWorkspaceMember(input: AddWorkspaceMemberInput): Promise<WorkspaceMember> {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('id', input.user_id)
+      .single();
+
+    if (!profile?.email) {
+      throw new Error('User profile or email not found');
+    }
+
+    return api.post<WorkspaceMember>(`/workspaces/${input.workspace_id}/members`, {
+      email: profile.email,
+      role: input.role,
     });
-
-    return data as Workspace;
   },
 
-  async getWorkspace(id: string) {
-    const { data, error } = await supabase
-      .from('workspaces')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    return data as Workspace;
+  async removeWorkspaceMember(workspaceId: string, userId: string): Promise<void> {
+    return api.del<void>(`/workspaces/${workspaceId}/members/${userId}`);
   },
 
-  async getWorkspaceBySlug(organizationId: string, slug: string) {
-    const { data, error } = await supabase
-      .from('workspaces')
-      .select('*')
-      .eq('organization_id', organizationId)
-      .eq('slug', slug)
-      .single();
-
-    if (error) throw error;
-    return data as Workspace;
-  },
-
-  async listOrganizationWorkspaces(organizationId: string) {
-    const { data, error } = await supabase
-      .from('workspaces')
-      .select('*')
-      .eq('organization_id', organizationId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data as Workspace[];
-  },
-
-  async updateWorkspace(id: string, input: UpdateWorkspaceInput) {
-    const { data, error } = await supabase
-      .from('workspaces')
-      .update(input)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data as Workspace;
-  },
-
-  async deleteWorkspace(id: string) {
-    const { error } = await supabase
-      .from('workspaces')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  },
-
-  async addWorkspaceMember(input: AddWorkspaceMemberInput) {
-    const { data, error } = await supabase
-      .from('workspace_members')
-      .insert({
-        workspace_id: input.workspace_id,
-        user_id: input.user_id,
-        role: input.role,
-        status: 'active',
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data as WorkspaceMember;
-  },
-
-  async removeWorkspaceMember(workspaceId: string, userId: string) {
-    const { error } = await supabase
-      .from('workspace_members')
-      .delete()
-      .eq('workspace_id', workspaceId)
-      .eq('user_id', userId);
-
-    if (error) throw error;
-  },
-
-  async updateWorkspaceMemberRole(workspaceId: string, userId: string, input: UpdateWorkspaceMemberRoleInput) {
+  async updateWorkspaceMemberRole(
+    workspaceId: string,
+    userId: string,
+    input: UpdateWorkspaceMemberRoleInput
+  ): Promise<WorkspaceMember> {
+    // If not implemented on backend yet, we can fall back to direct supabase or throw
+    // Let's implement this by updating the member directly in supabase, or we can use the API if we add it.
+    // To be safe and compliant, we update the role via supabase.
     const { data, error } = await supabase
       .from('workspace_members')
       .update({ role: input.role })
@@ -153,48 +94,24 @@ export const workspaceService = {
       .single();
 
     if (error) throw error;
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      recordActivity({
-        workspace_id: workspaceId,
-        actor_id: user.id,
-        entity_type: 'workspace',
-        entity_id: workspaceId,
-        event_type: 'member_role_updated',
-        title: 'Workspace member role updated',
-        description: `Updated workspace member role`,
-        metadata: {
-          user_id: userId,
-          user_name: user.email || 'Unknown user',
-          action: 'updated workspace member role',
-          role: input.role,
-        },
-      });
-    }
-
     return data as WorkspaceMember;
   },
 
-  async listWorkspaceMembers(workspaceId: string) {
-    const { data, error } = await supabase
-      .from('workspace_members')
-      .select(`
-        id,
-        role,
-        status,
-        joined_at,
-        user_id,
-        profiles (
-          id,
-          full_name,
-          username,
-          avatar_url
-        )
-      `)
-      .eq('workspace_id', workspaceId);
-
-    if (error) throw error;
-    return data as WorkspaceMemberWithProfile[];
+  async listWorkspaceMembers(workspaceId: string): Promise<WorkspaceMemberWithProfile[]> {
+    const members = await api.get<any[]>(`/workspaces/${workspaceId}/members`);
+    return members.map((m) => ({
+      id: m.id,
+      workspace_id: m.workspace_id,
+      user_id: m.user_id,
+      role: m.role,
+      status: m.status || 'active',
+      joined_at: m.joined_at,
+      profiles: m.profile ? {
+        id: m.user_id,
+        full_name: m.profile.full_name,
+        username: m.profile.username || m.profile.email.split('@')[0],
+        avatar_url: m.profile.avatar_url,
+      } : undefined,
+    })) as WorkspaceMemberWithProfile[];
   },
 };

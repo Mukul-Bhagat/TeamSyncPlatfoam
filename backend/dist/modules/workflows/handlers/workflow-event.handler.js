@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerWorkflowEventHandlers = registerWorkflowEventHandlers;
-const InternalEventBus_1 = require("../../core/event-bus/InternalEventBus");
+const InternalEventBus_1 = require("../../../core/event-bus/InternalEventBus");
 const eventBus = InternalEventBus_1.InternalEventBus.getInstance();
 function registerWorkflowEventHandlers() {
     // Workflow execution events

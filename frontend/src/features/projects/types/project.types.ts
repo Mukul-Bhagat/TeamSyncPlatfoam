@@ -1,7 +1,5 @@
 export const ProjectVisibility = {
   PRIVATE: 'private',
-  INTERNAL: 'internal',
-  PUBLIC: 'public',
 } as const;
 
 export type ProjectVisibility =
@@ -53,17 +51,7 @@ export const PROJECT_VISIBILITY_OPTIONS = [
   {
     value: ProjectVisibility.PRIVATE,
     label: 'Private',
-    description: 'Visible only to invited project members',
-  },
-  {
-    value: ProjectVisibility.INTERNAL,
-    label: 'Internal',
-    description: 'Visible to workspace members',
-  },
-  {
-    value: ProjectVisibility.PUBLIC,
-    label: 'Public',
-    description: 'Visible to the broader team workspace',
+    description: 'Invite-only and visible only to active project members',
   },
 ] as const;
 

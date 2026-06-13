@@ -65,7 +65,7 @@ class SearchEngine {
         // Search using vector similarity
         const vectorResults = await this.vectorProvider.search(embedding.embedding, limit, {
             organization_id: organizationId,
-            workspace_id,
+            workspace_id: workspaceId,
             entity_type: entityType,
         });
         // Fetch full documents for the vector results

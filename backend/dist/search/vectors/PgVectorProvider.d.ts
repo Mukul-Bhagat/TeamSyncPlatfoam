@@ -1,8 +1,7 @@
 import type { IVectorProvider, VectorDocument, SearchResult } from './IVectorProvider';
 export declare class PgVectorProvider implements IVectorProvider {
-    private dimension;
-    constructor(dimension?: number);
-    store(documentId: string, vector: number[], metadata?: Record<string, unknown>): Promise<void>;
+    constructor(_dimension?: number);
+    store(documentId: string, vector: number[], _metadata?: Record<string, unknown>): Promise<void>;
     storeBatch(documents: VectorDocument[]): Promise<void>;
     search(queryVector: number[], limit?: number, filters?: Record<string, unknown>): Promise<SearchResult[]>;
     delete(documentId: string): Promise<void>;

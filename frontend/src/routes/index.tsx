@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Outlet, createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
 import { LandingPage } from '@/pages/landing/LandingPage';
@@ -19,147 +19,166 @@ import { ChannelsPage } from '@/pages/channels/ChannelsPage';
 import { TeamPage } from '@/pages/team/TeamPage';
 import { ActivityPage } from '@/pages/activity/ActivityPage';
 import { OperationsPage } from '@/pages/operations/OperationsPage';
+import { SearchModalWrapper } from '@/components/search/SearchModalWrapper';
+import { usePanelStore } from '@/store/usePanelStore';
+
+function AppShell() {
+  const searchOpen = usePanelStore((state) => state.searchOpen);
+  const toggleSearch = usePanelStore((state) => state.toggleSearch);
+
+  return (
+    <>
+      <Outlet />
+      <SearchModalWrapper isOpen={searchOpen} onClose={toggleSearch} />
+    </>
+  );
+}
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <LandingPage />,
-  },
-  {
-    path: '/login',
-    element: (
-      <PublicRoute>
-        <LoginPage />
-      </PublicRoute>
-    ),
-  },
-  {
-    path: '/signup',
-    element: (
-      <PublicRoute>
-        <SignupPage />
-      </PublicRoute>
-    ),
-  },
-  {
-    path: '/forgot-password',
-    element: (
-      <PublicRoute>
-        <ForgotPasswordPage />
-      </PublicRoute>
-    ),
-  },
-  {
-    path: '/reset-password',
-    element: (
-      <PublicRoute>
-        <ResetPasswordPage />
-      </PublicRoute>
-    ),
-  },
-  {
-    path: '/workspace',
-    element: (
-      <ProtectedRoute>
-        <WorkspacePage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/workspace/:workspaceId/channel/:channelId',
-    element: (
-      <ProtectedRoute>
-        <ChannelPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/dashboard',
-    element: (
-      <ProtectedRoute>
-        <DashboardPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/projects',
-    element: (
-      <ProtectedRoute>
-        <ProjectsPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/projects/:projectId',
-    element: (
-      <ProtectedRoute>
-        <ProjectPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/settings',
-    element: (
-      <ProtectedRoute>
-        <SettingsPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/integrations',
-    element: (
-      <ProtectedRoute>
-        <IntegrationCenterPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/notifications',
-    element: (
-      <ProtectedRoute>
-        <NotificationCenterPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/workflows',
-    element: (
-      <ProtectedRoute>
-        <WorkflowCenterPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/channels',
-    element: (
-      <ProtectedRoute>
-        <ChannelsPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/team',
-    element: (
-      <ProtectedRoute>
-        <TeamPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/activity',
-    element: (
-      <ProtectedRoute>
-        <ActivityPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/operations',
-    element: (
-      <ProtectedRoute>
-        <OperationsPage />
-      </ProtectedRoute>
-    ),
+    element: <AppShell />,
+    children: [
+      {
+        path: '/',
+        element: <LandingPage />,
+      },
+      {
+        path: '/login',
+        element: (
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        ),
+      },
+      {
+        path: '/signup',
+        element: (
+          <PublicRoute>
+            <SignupPage />
+          </PublicRoute>
+        ),
+      },
+      {
+        path: '/forgot-password',
+        element: (
+          <PublicRoute>
+            <ForgotPasswordPage />
+          </PublicRoute>
+        ),
+      },
+      {
+        path: '/reset-password',
+        element: (
+          <PublicRoute>
+            <ResetPasswordPage />
+          </PublicRoute>
+        ),
+      },
+      {
+        path: '/workspace',
+        element: (
+          <ProtectedRoute>
+            <WorkspacePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/workspace/:workspaceId/channel/:channelId',
+        element: (
+          <ProtectedRoute>
+            <ChannelPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/dashboard',
+        element: (
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/projects',
+        element: (
+          <ProtectedRoute>
+            <ProjectsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/projects/:projectId',
+        element: (
+          <ProtectedRoute>
+            <ProjectPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/settings',
+        element: (
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/integrations',
+        element: (
+          <ProtectedRoute>
+            <IntegrationCenterPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/notifications',
+        element: (
+          <ProtectedRoute>
+            <NotificationCenterPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/workflows',
+        element: (
+          <ProtectedRoute>
+            <WorkflowCenterPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/channels',
+        element: (
+          <ProtectedRoute>
+            <ChannelsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/team',
+        element: (
+          <ProtectedRoute>
+            <TeamPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/activity',
+        element: (
+          <ProtectedRoute>
+            <ActivityPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/operations',
+        element: (
+          <ProtectedRoute>
+            <OperationsPage />
+          </ProtectedRoute>
+        ),
+      },
+    ],
   },
 ]);
 

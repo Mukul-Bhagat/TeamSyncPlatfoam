@@ -4,7 +4,6 @@ export declare class IndexingWorker {
     private isRunning;
     private processingInterval;
     private embeddingProvider;
-    private vectorProvider;
     constructor(queue: IndexingQueue);
     /**
      * Start the worker

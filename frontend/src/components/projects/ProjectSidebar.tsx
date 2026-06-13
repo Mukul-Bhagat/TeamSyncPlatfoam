@@ -50,14 +50,12 @@ export function ProjectSidebar({ workspaceId, currentProjectId }: ProjectSidebar
 
       <button
         onClick={() => setIsCreateProjectOpen(true)}
-        disabled={!resolvedWorkspaceId}
         className={cn(
           'w-full flex items-center justify-center gap-2 px-3 py-2',
           'bg-glass border border-glass-border rounded-lg',
           'text-sm font-medium text-muted-foreground',
           'hover:text-foreground hover:border-primary/50',
-          'transition-all duration-fast',
-          !resolvedWorkspaceId && 'opacity-50 cursor-not-allowed'
+          'transition-all duration-fast'
         )}
       >
         <Plus className="w-4 h-4" />

@@ -1,9 +1,16 @@
+import { supabase } from './supabase';
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 export class ApiError extends Error {
-  constructor(public statusCode: number, message: string, public code?: string) {
+  statusCode: number;
+  code?: string;
+
+  constructor(statusCode: number, message: string, code?: string) {
     super(message);
     this.name = 'ApiError';
+    this.statusCode = statusCode;
+    this.code = code;
   }
 }
 
@@ -15,44 +22,69 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
+async function getHeaders(customHeaders: Record<string, string> = {}): Promise<HeadersInit> {
+  const headers: Record<string, string> = {
+    ...customHeaders,
+  };
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`;
+    }
+  } catch (error) {
+    console.error('Failed to resolve auth session token:', error);
+  }
+
+  return headers;
+}
+
 export const api = {
-  get: <T>(path: string, params?: Record<string, string>): Promise<T> => {
-    const url = new URL(path, API_BASE);
+  get: async <T>(path: string, params?: Record<string, string>): Promise<T> => {
+    const url = new URL(`${API_BASE}${path}`);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value) url.searchParams.set(key, value);
+        if (value !== undefined && value !== null && value !== '') {
+          url.searchParams.set(key, value);
+        }
       });
     }
-    return fetch(url.toString()).then(handleResponse<T>);
+    const headers = await getHeaders();
+    return fetch(url.toString(), { headers }).then(handleResponse<T>);
   },
 
-  post: <T>(path: string, body: unknown): Promise<T> => {
+  post: async <T>(path: string, body: unknown): Promise<T> => {
+    const headers = await getHeaders({ 'Content-Type': 'application/json' });
     return fetch(`${API_BASE}${path}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(body),
     }).then(handleResponse<T>);
   },
 
-  put: <T>(path: string, body: unknown): Promise<T> => {
+  put: async <T>(path: string, body: unknown): Promise<T> => {
+    const headers = await getHeaders({ 'Content-Type': 'application/json' });
     return fetch(`${API_BASE}${path}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(body),
     }).then(handleResponse<T>);
   },
 
-  patch: <T>(path: string, body: unknown): Promise<T> => {
+  patch: async <T>(path: string, body: unknown): Promise<T> => {
+    const headers = await getHeaders({ 'Content-Type': 'application/json' });
     return fetch(`${API_BASE}${path}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(body),
     }).then(handleResponse<T>);
   },
 
-  del: <T>(path: string): Promise<T> => {
+  del: async <T>(path: string): Promise<T> => {
+    const headers = await getHeaders();
     return fetch(`${API_BASE}${path}`, {
       method: 'DELETE',
+      headers,
     }).then(handleResponse<T>);
   },
 };

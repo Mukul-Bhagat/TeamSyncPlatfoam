@@ -14,7 +14,7 @@ export interface Project {
   owner_id: string;
   workspace_id?: string;
   team_id?: string;
-  visibility?: 'private' | 'internal' | 'public';
+  visibility?: 'private';
   icon?: string;
   color?: string;
   created_by?: string;
